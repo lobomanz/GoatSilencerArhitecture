@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GoatSilencer Architecture</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+            <div class="container">
+                <!-- Logo (left) -->
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" alt="Logo" style="height:40px;" class="me-2" />
+                    GoatSilencer Architecture
+                </a>
+
+                <!-- Toggle for mobile -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navigation links (right) -->
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Projects" asp-action="Index">Projects</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Services" asp-action="Index">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="About" asp-action="Index">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="References" asp-action="Index">References</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Contact" asp-action="Index">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p class="mb-0">&copy; @DateTime.Now.Year GoatSilencer Architecture</p>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
