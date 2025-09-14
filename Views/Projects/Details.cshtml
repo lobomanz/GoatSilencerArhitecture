@@ -1,0 +1,61 @@
+﻿@model GoatSilencerArchitecture.Models.Gallery
+@{
+    Layout = "_PublicLayout";
+    ViewData["Title"] = Model?.Title ?? "Project";
+}
+
+<div class="container-fluid px-0" style="max-width:1600px; margin:auto;">
+    <!-- Carousel for project images -->
+    @if (Model?.Images != null && Model.Images.Any())
+    {
+        <div id="projectCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                @for (int i = 0; i < Model.Images.Count; i++)
+                {
+                    var img = Model.Images.ElementAt(i);
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <img src="@img.FilePath" class="d-block w-100" style="max-height:600px; object-fit:cover;" alt="@img.Caption" />
+                        @if (!string.IsNullOrEmpty(img.Caption))
+                        {
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                <p>@img.Caption</p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    }
+    else
+    {
+        <p class="text-center">No images available for this project.</p>
+    }
+</div>
+
+<div class="container my-5" style="max-width:1600px;">
+    <h1 class="mb-4 text-center">@Model?.Title</h1>
+
+    @if (!string.IsNullOrEmpty(Model?.RichTextContent))
+    {
+        <div class="project-content">
+            @Html.Raw(Model.RichTextContent)
+        </div>
+    }
+    else
+    {
+        <p>No content available for this project.</p>
+    }
+
+    <div class="mt-4 text-center">
+        <a asp-action="Index" class="btn btn-secondary">← Back to Projects</a>
+    </div>
+</div>
+    

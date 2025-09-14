@@ -1,0 +1,53 @@
+@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Galleries</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Main Image</th>
+            <th>@Html.DisplayNameFor(model => model.Title)</th>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>@Html.DisplayNameFor(model => model.IsPublished)</th>
+            <th>@Html.DisplayNameFor(model => model.SortOrder)</th>
+            <th>@Html.DisplayNameFor(model => model.CreatedUtc)</th>
+            <th>@Html.DisplayNameFor(model => model.UpdatedUtc)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.MainImage))
+                    {
+                        <img src="@item.MainImage" class="img-thumbnail" style="max-height:60px;" />
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+                <td>@item.Title</td>
+                <td>@item.Description</td>
+                <td>@item.IsPublished</td>
+                <td>@item.SortOrder</td>
+                <td>@item.CreatedUtc</td>
+                <td>@item.UpdatedUtc</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
