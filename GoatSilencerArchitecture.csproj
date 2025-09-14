@@ -7,6 +7,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Areas\Admin\wwwroot\**" />
+	  <Content Remove="Areas\Admin\wwwroot\**" />
+	  <EmbeddedResource Remove="Areas\Admin\wwwroot\**" />
+	  <None Remove="Areas\Admin\wwwroot\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<!-- Identity and EF Core -->
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
@@ -19,7 +26,6 @@
 		<!-- Scaffolding support -->
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 	</ItemGroup>
 
 </Project>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GoatSilencerArchitecture.Views.Shared
 {
-    public class _PublicLayoutModel : PageModel
+    public class _LayoutModel : PageModel
     {
         public void OnGet()
         {

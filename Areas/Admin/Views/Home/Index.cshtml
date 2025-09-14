@@ -1,0 +1,76 @@
+﻿@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
+
+@{
+    ViewData["Title"] = "Home Page";
+    var featured = ViewData["FeaturedGalleries"] as List<GoatSilencerArchitecture.Models.Gallery>;
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4">Welcome to GoatSilencer Architecture</h1>
+    <p>Explore our latest galleries below!</p>
+</div>
+
+@if (featured != null && featured.Any())
+{
+    <div id="galleryCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            @for (int i = 0; i < featured.Count; i++)
+            {
+                var gallery = featured[i];
+                <div class="carousel-item @(i == 0 ? "active" : "")">
+                    @if (gallery.Images != null && gallery.Images.Any())
+                    {
+                        <img src="@gallery.Images.First().FilePath" class="d-block w-100" style="height:400px; object-fit:cover;" alt="@gallery.Title" />
+                    }
+                    else
+                    {
+                        <img src="/images/placeholder.png" class="d-block w-100" style="height:400px; object-fit:cover;" alt="No image available" />
+                    }
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                        <h5>@gallery.Title</h5>
+                        <p>@gallery.Description</p>
+                        <a asp-controller="Galleries" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-sm btn-light">View Gallery</a>
+                    </div>
+                </div>
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="row">
+        @foreach (var gallery in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    @if (gallery.Images != null && gallery.Images.Any())
+                    {
+                        <img src="@gallery.Images.First().FilePath" class="card-img-top" style="height:200px; object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <img src="/images/placeholder.png" class="card-img-top" style="height:200px; object-fit:cover;" />
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@gallery.Title</h5>
+                        <p class="card-text text-truncate">@gallery.Description</p>
+                        <a asp-controller="Galleries" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-primary btn-sm">View</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-center">No galleries available at the moment.</p>
+}

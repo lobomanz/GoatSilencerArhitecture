@@ -1,33 +1,41 @@
-﻿@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
-@{
-    Layout = "_PublicLayout";
-    ViewData["Title"] = "Services";
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Public layout
 }
 
-<div class="container my-5" style="max-width:1600px;">
-    <h1 class="mb-4 text-center">Our Services</h1>
+<div class="text-center mb-5">
+    <h1 class="display-4">Welcome to GoatSilencer Architecture</h1>
+    <p class="lead">We design inspiring, sustainable, and functional spaces.</p>
+</div>
 
-    @if (Model != null && Model.Any())
-    {
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            @foreach (var service in Model)
-            {
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        <a asp-controller="Services" asp-action="Details" asp-route-id="@service.Id" class="text-decoration-none">
-                            <img src="@Url.Content(service.MainImage ?? "/uploads/placeholder.jpg")"
-                                 class="card-img-top" alt="@service.Title" style="object-fit: cover; height: 200px;" />
-                            <div class="card-body text-center">
-                                <h5 class="card-title text-dark">@service.Title</h5>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            }
+<div class="row text-center">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Our Projects</h5>
+                <p class="card-text">See some of the latest projects we’ve worked on.</p>
+                <a asp-controller="Projects" asp-action="Index" class="btn btn-primary">View Projects</a>
+            </div>
         </div>
-    }
-    else
-    {
-        <p class="text-center">No services available at the moment.</p>
-    }
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Our Services</h5>
+                <p class="card-text">Learn more about the architectural services we provide.</p>
+                <a asp-controller="Services" asp-action="Index" class="btn btn-primary">View Services</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Contact Us</h5>
+                <p class="card-text">Let’s discuss how we can bring your vision to life.</p>
+                <a asp-controller="Contact" asp-action="Index" class="btn btn-primary">Get in Touch</a>
+            </div>
+        </div>
+    </div>
 </div>
