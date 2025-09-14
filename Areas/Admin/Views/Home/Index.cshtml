@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
     var featured = ViewData["FeaturedGalleries"] as List<GoatSilencerArchitecture.Models.Gallery>;
 }
 
