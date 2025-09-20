@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GoatSilencerArchitecture.Data;
 using GoatSilencerArchitecture.Models;
-
-
-
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Webp;
 
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
@@ -62,7 +63,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             {
                 if (MainImageFile != null && MainImageFile.Length > 0)
                 {
-                    gallery.MainImage = await SaveMainImage(MainImageFile);
+                    gallery.MainImage = await SaveAndCompressImage(MainImageFile);
                 }
 
                 _context.Add(gallery);
@@ -99,7 +100,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 {
                     if (MainImageFile != null && MainImageFile.Length > 0)
                     {
-                        gallery.MainImage = await SaveMainImage(MainImageFile);
+                        gallery.MainImage = await SaveAndCompressImage(MainImageFile);
                     }
 
                     _context.Update(gallery);
@@ -134,22 +135,17 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             var gallery = await _context.Galleries.FindAsync(id);
             if (gallery != null)
             {
-                // Delete main image
+                // Delete main image + jpeg fallback
                 if (!string.IsNullOrEmpty(gallery.MainImage))
                 {
-                    var path = Path.Combine(_env.WebRootPath, gallery.MainImage.TrimStart('/'));
-                    if (System.IO.File.Exists(path))
-                        System.IO.File.Delete(path);
+                    DeleteImageFiles(gallery.MainImage);
                 }
 
                 // Delete gallery images
                 var images = _context.GalleryImages.Where(i => i.GalleryId == id).ToList();
                 foreach (var img in images)
                 {
-                    var filePath = Path.Combine(_env.WebRootPath, img.FilePath.TrimStart('/'));
-                    if (System.IO.File.Exists(filePath))
-                        System.IO.File.Delete(filePath);
-
+                    DeleteImageFiles(img.FilePath);
                     _context.GalleryImages.Remove(img);
                 }
 
@@ -170,21 +166,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             if (file != null && file.Length > 0)
             {
-                var uploadPath = Path.Combine(_env.WebRootPath, "uploads");
-                Directory.CreateDirectory(uploadPath);
-
-                var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-                var filePath = Path.Combine(uploadPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
+                var savedPath = await SaveAndCompressImage(file);
 
                 var newImage = new GalleryImage
                 {
                     GalleryId = galleryId,
-                    FilePath = "/uploads/" + fileName,
+                    FilePath = savedPath,
                     Caption = caption ?? ""
                 };
 
@@ -207,19 +194,13 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteImage(int id, int galleryId)
         {
-            var gallery = await _context.Galleries
-                .Include(g => g.Images)
-                .FirstOrDefaultAsync(g => g.Id == galleryId);
-
+            var gallery = await _context.Galleries.Include(g => g.Images).FirstOrDefaultAsync(g => g.Id == galleryId);
             if (gallery == null) return NotFound();
 
             var image = await _context.GalleryImages.FindAsync(id);
             if (image != null)
             {
-                var filePath = Path.Combine(_env.WebRootPath, image.FilePath.TrimStart('/'));
-                if (System.IO.File.Exists(filePath))
-                    System.IO.File.Delete(filePath);
-
+                DeleteImageFiles(image.FilePath);
                 _context.GalleryImages.Remove(image);
                 await _context.SaveChangesAsync();
 
@@ -244,10 +225,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetMainImage(int id, int galleryId)
         {
-            var gallery = await _context.Galleries
-                .Include(g => g.Images)
-                .FirstOrDefaultAsync(g => g.Id == galleryId);
-
+            var gallery = await _context.Galleries.Include(g => g.Images).FirstOrDefaultAsync(g => g.Id == galleryId);
             if (gallery == null) return NotFound();
 
             var image = gallery.Images.FirstOrDefault(i => i.Id == id);
@@ -266,20 +244,38 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return _context.Galleries.Any(e => e.Id == id);
         }
 
-        private async Task<string> SaveMainImage(IFormFile file)
+        private async Task<string> SaveAndCompressImage(IFormFile file)
         {
             var uploadPath = Path.Combine(_env.WebRootPath, "uploads");
             Directory.CreateDirectory(uploadPath);
 
-            var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-            var filePath = Path.Combine(uploadPath, fileName);
+            var fileName = Guid.NewGuid().ToString();
+            var jpegPath = Path.Combine(uploadPath, fileName + ".jpg");
+            var webpPath = Path.Combine(uploadPath, fileName + ".webp");
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            using (var image = await Image.LoadAsync(file.OpenReadStream()))
             {
-                await file.CopyToAsync(stream);
+                if (image.Width > 1600)
+                {
+                    image.Mutate(x => x.Resize(1600, 0));
+                }
+
+                await image.SaveAsJpegAsync(jpegPath, new JpegEncoder { Quality = 75 });
+                await image.SaveAsWebpAsync(webpPath, new WebpEncoder { Quality = 75 });
             }
 
-            return "/uploads/" + fileName;
+            return "/uploads/" + fileName + ".webp";
+        }
+
+        private void DeleteImageFiles(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath)) return;
+
+            var webpPath = Path.Combine(_env.WebRootPath, filePath.TrimStart('/'));
+            var jpegPath = Path.ChangeExtension(webpPath, ".jpg");
+
+            if (System.IO.File.Exists(webpPath)) System.IO.File.Delete(webpPath);
+            if (System.IO.File.Exists(jpegPath)) System.IO.File.Delete(jpegPath);
         }
     }
 }
