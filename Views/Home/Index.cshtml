@@ -27,43 +27,8 @@
     </div>
 </div>
 
-<style>
-    .magic-circle {
-        width: 240px;
-        height: 240px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        background: radial-gradient(circle, rgba(0,255,255,0.15), transparent 70%);
-        box-shadow: 0 0 30px rgba(0, 255, 255, 0.6), 0 0 60px rgba(0, 128, 255, 0.4), 0 0 100px rgba(0, 128, 255, 0.3);
-    }
 
-        /* The outer magic ring */
-        .magic-circle .ring {
-            position: absolute;
-            width: 260px;
-            height: 260px;
-            border: 3px dashed rgba(0, 255, 255, 0.7);
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(0,255,255,0.5);
-        }
-</style>
 
-<script>
-    // Rotate the magic ring with JS instead of CSS keyframes
-    let angle = 0;
-    const ring = document.querySelector('.magic-circle .ring');
-    setInterval(() => {
-        angle = (angle + 2) % 360; // increase rotation angle
-        ring.style.transform = `rotate(${angle}deg)`;
-    }, 30); // ~33fps (smooth enough)
-
-    // Hide loader after 3 seconds
-    window.addEventListener("load", function () {
-        setTimeout(function () {
-            document.getElementById("loader").style.display = "none";
-        }, 3000);
-    });
-</script>
+@section Scripts {
+    <script src="~/js/Home/Index.js" asp-append-version="true"></script>
+}
