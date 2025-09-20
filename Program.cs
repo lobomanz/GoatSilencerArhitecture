@@ -7,9 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // MVC
 builder.Services.AddControllersWithViews();
 
-// DB (SQLite)
+// Build absolute SQLite path (always relative to app root)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var dbPath = Path.Combine(builder.Environment.ContentRootPath, connectionString!.Replace("Data Source=", ""));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 // Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -36,7 +38,5 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-
 
 app.Run();

@@ -7,11 +7,28 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Areas\Admin\wwwroot\**" />
-	  <Content Remove="Areas\Admin\wwwroot\**" />
-	  <EmbeddedResource Remove="Areas\Admin\wwwroot\**" />
-	  <None Remove="Areas\Admin\wwwroot\**" />
+		<Compile Remove="Areas\Admin\wwwroot\**" />
+		<Content Remove="Areas\Admin\wwwroot\**" />
+		<EmbeddedResource Remove="Areas\Admin\wwwroot\**" />
+		<None Remove="Areas\Admin\wwwroot\**" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Content Remove="web.config" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="web.config" />
+	</ItemGroup>
+
+	<!-- Copy SQLite DB file when building/publishing -->
+	<ItemGroup>
+		<None Update="GoatSilencer.db">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+
 
 	<ItemGroup>
 		<!-- Identity and EF Core -->
@@ -26,7 +43,6 @@
 		<!-- Scaffolding support -->
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.3" />
-
 	</ItemGroup>
 
 </Project>
