@@ -1,36 +1,37 @@
-﻿@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
+@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
 @{
     ViewData["Title"] = "Welcome";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-<div class="hero-slider">
-    @if (Model != null && Model.Any())
-    {
-        var index = 0;
-        foreach (var project in Model)
+<div class="fullpage-slider">
+    <div class="slider-container">
+        @if (Model != null && Model.Any())
         {
-            var img = !string.IsNullOrEmpty(project.MainImage)
-            ? project.MainImage
-            : (project.Images.Any() ? project.Images.First().FilePath : "/images/placeholder.jpg");
+            foreach (var project in Model)
+            {
+                var img = !string.IsNullOrEmpty(project.MainImage)
+                    ? project.MainImage
+                    : (project.Images.Any() ? project.Images.First().FilePath : "/images/placeholder.jpg");
 
-            <div class="hero-slide @(index == 0 ? "active" : "")"
-                 style="background-image: url('@img')">
-                <div class="hero-content">
-                    <h2>@project.Title</h2>
-                    <a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id"
-                       class="btn btn-light mt-2">See this project</a>
+                <div class="slide" style="background-image: url('@Url.Content(img)')">
+                    <div class="slide-content">
+                        <h2>@project.Title</h2>
+                        <a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id"
+                           class="btn btn-outline-light mt-2">Look at the project</a>
+                    </div>
                 </div>
-            </div>
-            index++;
+            }
         }
-    }
+    </div>
 
-    <div class="hero-dots">
-        @for (int i = 0; i < (Model?.Count() ?? 0); i++)
+    <div class="slider-dots">
+        @if (Model != null)
         {
-            <div class="hero-dot @(i == 0 ? "active" : "")" data-index="@i"></div>
+            for (int i = 0; i < Model.Count(); i++)
+            {
+                <div class="dot" data-index="@i"></div>
+            }
         }
     </div>
 </div>

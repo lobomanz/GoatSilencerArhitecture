@@ -4,7 +4,7 @@
     ViewData["Title"] = Model?.Title ?? "Project";
 }
 
-<div class="container-fluid px-0" style="max-width:1600px; margin:auto;">
+<div class="container-fluid px-0" margin:auto;">
     <!-- Carousel for project images -->
     @if (Model?.Images != null && Model.Images.Any())
     {
@@ -40,7 +40,7 @@
     }
 </div>
 
-<div class="container my-5" style="max-width:1600px;">
+<div class="container my-5" >
     <h1 class="mb-4 text-center">@Model?.Title</h1>
 
     @if (!string.IsNullOrEmpty(Model?.RichTextContent))

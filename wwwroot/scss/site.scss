@@ -29,3 +29,11 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.custom-header-container {
+    @media (min-width: 992px) { // Bootstrap's 'lg' breakpoint for desktop
+        width: calc(100% - 80px);
+        margin-left: 40px;
+        margin-right: 40px;
+    }
+}
