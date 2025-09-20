@@ -1,14 +1,35 @@
-// Rotate the magic ring with JS instead of CSS keyframes
-let angle = 0;
-const ring = document.querySelector('.magic-circle .ring');
-setInterval(() => {
-    angle = (angle + 2) % 360; // increase rotation angle
-    ring.style.transform = `rotate(${angle}deg)`;
-}, 30); // ~33fps (smooth enough)
+document.addEventListener("DOMContentLoaded", function () {
+    const slides = document.querySelectorAll(".hero-slide");
+    const dots = document.querySelectorAll(".hero-dot");
+    let current = 0;
 
-// Hide loader after 3 seconds
-window.addEventListener("load", function () {
-    setTimeout(function () {
-        document.getElementById("loader").style.display = "none";
-    }, 3000);
+    function showSlide(index) {
+        slides.forEach((s, i) => {
+            s.classList.remove("active", "prev");
+            if (i === index) {
+                s.classList.add("active");
+            } else if (i === (index - 1 + slides.length) % slides.length) {
+                s.classList.add("prev");
+            }
+        });
+
+        dots.forEach((d, i) => {
+            d.classList.toggle("active", i === index);
+        });
+
+        current = index;
+    }
+
+    function nextSlide() {
+        let next = (current + 1) % slides.length;
+        showSlide(next);
+    }
+
+    dots.forEach(d => {
+        d.addEventListener("click", () => {
+            showSlide(parseInt(d.dataset.index));
+        });
+    });
+
+    setInterval(nextSlide, 4000); // 4s autoplay
 });
