@@ -3,6 +3,7 @@ using System;
 using GoatSilencerArchitecture.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoatSilencerArchitecture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250920182500_AddAboutComponentsTable")]
+    partial class AddAboutComponentsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
@@ -26,13 +29,7 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Image1AltText")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Image1Path")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Image2AltText")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image2Path")
@@ -75,9 +72,6 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<string>("MainImage")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("MainImageAltText")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("RichTextContent")
                         .HasColumnType("TEXT");
 
@@ -105,10 +99,6 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("AltText")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Caption")
                         .IsRequired()

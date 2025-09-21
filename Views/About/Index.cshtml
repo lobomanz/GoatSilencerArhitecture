@@ -1,0 +1,110 @@
+@using GoatSilencerArchitecture.Data
+@using Microsoft.EntityFrameworkCore;
+@inject ApplicationDbContext Context
+@{
+    ViewData["Title"] = "About Us";
+}
+
+<h1>About Us</h1>
+
+@{
+    var components = await Context.AboutComponents.OrderBy(c => c.SortOrder).ToListAsync();
+}
+
+@if (components.Any())
+{
+    @foreach (var component in components)
+    {
+        <section class="container-layout @component.LayoutType">
+            @if (component.LayoutType == "layout-type-1")
+            {
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+                <div class="image-content">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                    }
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-2")
+            {
+                <div class="image-content">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                    }
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-3")
+            {
+                <div class="image-content-left">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="Component Image 1" />
+                    }
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+                <div class="image-content-right">
+                    @if (!string.IsNullOrEmpty(component.Image2Path))
+                    {
+                        <img src="@Url.Content(component.Image2Path)" alt="Component Image 2" />
+                    }
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-4")
+            {
+                <div class="image-content image-float-right">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                    }
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-5")
+            {
+                <div class="image-content image-float-left">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                    }
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-6")
+            {
+                <div class="text-content full-width">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-7")
+            {
+                <div class="image-content full-width">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
+                    }
+                </div>
+            }
+        </section>
+    }
+}
+else
+{
+    <p>No About Us components have been added yet. Please add some from the <a href="/Admin/AboutComponents">Admin panel</a>.</p>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/layouts.css" asp-append-version="true" />
+}

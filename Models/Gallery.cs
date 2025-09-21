@@ -19,6 +19,7 @@ namespace GoatSilencerArchitecture.Models
 
         // New property for the project/service thumbnail (used in grids)
         public string? MainImage { get; set; }
+        public string? MainImageAltText { get; set; } = string.Empty;
 
         public ICollection<GalleryImage> Images { get; set; } = new List<GalleryImage>();
         public string? RichTextContent { get; set; }

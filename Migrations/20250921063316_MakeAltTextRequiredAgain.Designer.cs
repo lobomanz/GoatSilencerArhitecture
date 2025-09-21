@@ -3,6 +3,7 @@ using System;
 using GoatSilencerArchitecture.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoatSilencerArchitecture.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250921063316_MakeAltTextRequiredAgain")]
+    partial class MakeAltTextRequiredAgain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
@@ -27,12 +30,14 @@ namespace GoatSilencerArchitecture.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image1AltText")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image1Path")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image2AltText")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image2Path")

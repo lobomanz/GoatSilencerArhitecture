@@ -1,0 +1,137 @@
+@model GoatSilencerArchitecture.Models.AboutComponent
+
+@{
+    ViewData["Title"] = "Edit About Component";
+}
+
+<h1>Edit About Component</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="SortOrder" />
+            <input type="hidden" asp-for="CreatedUtc" />
+
+            <div class="form-group">
+                <label asp-for="LayoutType" class="control-label"></label>
+                <select asp-for="LayoutType" class="form-control" id="LayoutType">
+                    <option value="layout-type-1">Layout Type 1 (Text Left, Image Right)</option>
+                    <option value="layout-type-2">Layout Type 2 (Image Left, Text Right)</option>
+                    <option value="layout-type-3">Layout Type 3 (Image Left, Text Middle, Image Right)</option>
+                    <option value="layout-type-4">Layout Type 4 (Image Top Right, Text Spill Left)</option>
+                    <option value="layout-type-5">Layout Type 5 (Image Top Left, Text Spill Right)</option>
+                    <option value="layout-type-6">Layout Type 6 (100% Text)</option>
+                    <option value="layout-type-7">Layout Type 7 (100% Picture)</option>
+                </select>
+                <span asp-validation-for="LayoutType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" id="textContentGroup">
+                <label asp-for="TextContent" class="control-label"></label>
+                <textarea asp-for="TextContent" class="form-control rich-text-editor" rows="10"></textarea>
+                <span asp-validation-for="TextContent" class="text-danger"></span>
+            </div>
+
+            <div class="form-group" id="image1Group">
+                <label>Image 1</label>
+                @if (!string.IsNullOrEmpty(Model.Image1Path))
+                {
+                    <img src="@Model.Image1Path" class="img-thumbnail mb-2" style="max-height:150px;" alt="@Model.Image1AltText" />
+                }
+                <input type="file" name="image1File" class="form-control" />
+                <label>Image 1 Alt Text</label>
+                <input type="text" name="image1AltText" value="@Model.Image1AltText" class="form-control" />
+            </div>
+
+            <div class="form-group" id="image2Group">
+                <label>Image 2 (for Layout Type 3)</label>
+                @if (!string.IsNullOrEmpty(Model.Image2Path))
+                {
+                    <img src="@Model.Image2Path" class="img-thumbnail mb-2" style="max-height:150px;" alt="@Model.Image2AltText" />
+                }
+                <input type="file" name="image2File" class="form-control" />
+                <label>Image 2 Alt Text</label>
+                <input type="text" name="image2AltText" value="@Model.Image2AltText" class="form-control" />
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.tiny.cloud/1/5f03jnyxt3mkb0yuyavvuvvobp0a9y3zrrp1oqhu89aiwgmr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea.rich-text-editor',
+            height: 300,
+            menubar: false,
+            plugins: 'link image lists code table',
+            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+            block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4',
+            content_style: 'body { font-family: Arial, sans-serif; line-height: 1.6; font-size: 16px; }'
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const layoutTypeSelect = document.getElementById('LayoutType');
+            const image1Group = document.getElementById('image1Group');
+            const image2Group = document.getElementById('image2Group');
+            const textContentGroup = document.getElementById('textContentGroup');
+
+            // Get the alt text input fields
+            const image1AltTextInput = document.querySelector('#image1Group input[name="image1AltText"]');
+            const image2AltTextInput = document.querySelector('#image2Group input[name="image2AltText"]');
+
+            function toggleFieldVisibility() {
+                const selectedLayout = layoutTypeSelect.value;
+
+                // Reset all to visible first
+                image1Group.style.display = 'block';
+                image2Group.style.display = 'block';
+                textContentGroup.style.display = 'block';
+
+                // Hide based on layout type
+                switch (selectedLayout) {
+                    case 'layout-type-6': // 100% Text
+                        image1Group.style.display = 'none';
+                        image2Group.style.display = 'none';
+                        break;
+                    case 'layout-type-7': // 100% Picture
+                        textContentGroup.style.display = 'none';
+                        image2Group.style.display = 'none'; // No image 2 for 100% picture
+                        break;
+                    case 'layout-type-3': // Image Left, Text Middle, Image Right (requires 2 images)
+                        // All visible, but ensure image2 is visible
+                        break;
+                    default: // Other types (1, 2, 4, 5) require Image 1 and Text, no Image 2
+                        image2Group.style.display = 'none';
+                        break;
+                }
+
+                // Also hide alt text fields if their corresponding image upload is hidden
+                if (image1Group.style.display === 'none' && image1AltTextInput) {
+                    image1AltTextInput.closest('.form-group').style.display = 'none';
+                }
+                if (image2Group.style.display === 'none' && image2AltTextInput) {
+                    image2AltTextInput.closest('.form-group').style.display = 'none';
+                }
+            }
+
+            // Initial call on page load
+            toggleFieldVisibility();
+
+            // Listen for changes
+            layoutTypeSelect.addEventListener('change', toggleFieldVisibility);
+        });
+    </script>
+}

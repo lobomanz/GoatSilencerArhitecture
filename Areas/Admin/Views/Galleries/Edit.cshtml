@@ -74,8 +74,18 @@
         @foreach (var img in Model.Images)
         {
             <div class="col-md-3 text-center mb-3">
-                <img src="@img.FilePath" class="img-thumbnail mb-2" style="max-height:150px;" />
+                <img src="@img.FilePath" class="img-thumbnail mb-2" style="max-height:150px;" alt="@img.AltText" />
                 <p>@img.Caption</p>
+
+                <!-- Alt Text Input -->
+                <form asp-action="UpdateImageAltText" method="post" class="d-inline">
+                    <input type="hidden" name="id" value="@img.Id" />
+                    <input type="hidden" name="galleryId" value="@Model.Id" />
+                    <div class="form-group mb-2">
+                        <input type="text" name="altText" value="@img.AltText" class="form-control form-control-sm" placeholder="Alt Text" />
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-info">Save Alt Text</button>
+                </form>
 
                 <!-- Mark as Main Image / Badge -->
                 @if (Model.MainImage == img.FilePath)
@@ -117,6 +127,10 @@ else
     <div class="form-group">
         <label>Caption (optional)</label>
         <input type="text" name="caption" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Alt Text (optional)</label>
+        <input type="text" name="altText" class="form-control" />
     </div>
     <button type="submit" class="btn btn-success mt-2">Upload Image</button>
 </form>

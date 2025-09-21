@@ -1,0 +1,106 @@
+@model IEnumerable<GoatSilencerArchitecture.Models.AboutComponent>
+
+@{
+    ViewData["Title"] = "About Components";
+}
+
+<h1>About Components</h1>
+
+@Html.AntiForgeryToken()
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.LayoutType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TextContent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SortOrder)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr data-id="@item.Id">
+                <td>
+                    @Html.DisplayFor(modelItem => item.LayoutType)
+                </td>
+                <td>
+                    @(item.TextContent.Length > 100 ? item.TextContent.Substring(0, 100) + "..." : item.TextContent)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SortOrder)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.querySelector('tbody');
+            var sortable = Sortable.create(el, {
+                animation: 150,
+                onEnd: function (evt) {
+                    var itemEl = evt.item; // dragged HTMLElement
+                    var newIndex = evt.newIndex;
+                    var oldIndex = evt.oldIndex;
+
+                    if (newIndex !== oldIndex) {
+                        var ids = [];
+                        // Get the new order of IDs
+                        el.querySelectorAll('tr').forEach(function (row) {
+                            var id = row.getAttribute('data-id'); // Get ID from data-id attribute
+                            ids.push(parseInt(id));
+                        });
+
+                        // Include Anti-forgery token
+                        var antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
+                        var tokenValue = antiForgeryToken ? antiForgeryToken.value : '';
+
+                        // Send new order to server
+                        fetch('/Admin/AboutComponents/Reorder', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': tokenValue
+                            },
+                            body: JSON.stringify(ids)
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json(); // Or response.text() if no JSON is returned
+                        })
+                        .then(data => {
+                            console.log('Reorder successful:', data);
+                            // Optionally, refresh the page or update SortOrder display
+                            location.reload(); // Simple refresh to update SortOrder display
+                        })
+                        .catch(error => {
+                            console.error('Error reordering:', error);
+                            alert('Failed to reorder components. Please try again.');
+                            location.reload(); // Reload on error to revert order
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,155 @@
+.container-layout {
+    display: flex;
+    flex-wrap: wrap; // Allow wrapping on smaller screens
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    gap: 20px; // Margin between items
+
+    .text-content {
+        flex: 1; // Take available space
+        padding: 10px;
+    }
+
+    .image-content,
+    .image-content-left,
+    .image-content-right {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+    }
+}
+
+/* Type 1: Picture Right (50%), Text Left (50%) */
+.layout-type-1 {
+    .text-content {
+        flex: 1 1 45%; // Grow, shrink, base 45%
+    }
+    .image-content {
+        flex: 1 1 45%; // Grow, shrink, base 45%
+    }
+}
+
+/* Type 2: Picture Left (50%), Text Right (50%) */
+.layout-type-2 {
+    .text-content {
+        flex: 1 1 45%;
+    }
+    .image-content {
+        flex: 1 1 45%;
+    }
+}
+
+/* Type 3: Picture Left (30%), Text Middle (40%), Picture Right (30%) */
+.layout-type-3 {
+    .image-content-left {
+        flex: 0 0 28%; // Fixed 28% (with gap, totals ~30%)
+    }
+    .text-content {
+        flex: 1 1 36%; // Grow, shrink, base 36% (with gap, totals ~40%)
+    }
+    .image-content-right {
+        flex: 0 0 28%; // Fixed 28%
+    }
+}
+
+/* Type 4: Image Top Right, Text Left (Spill Below) */
+.layout-type-4 {
+    display: block; // Override flex from .container-layout
+    .image-content {
+        float: right;
+        width: 30%; // Example width for the image
+        margin-left: 20px; // Space between image and text
+        margin-bottom: 20px; // Space below image when text spills
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+    }
+    .text-content {
+        // Text will naturally flow around the floated image
+    }
+    &::after { // Clearfix for the float
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+/* Type 5: Image Top Left, Text Right (Spill Below) */
+.layout-type-5 {
+    display: block; // Override flex from .container-layout
+    .image-content {
+        float: left;
+        width: 30%; // Example width for the image
+        margin-right: 20px; // Space between image and text
+        margin-bottom: 20px; // Space below image when text spills
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+    }
+    .text-content {
+        // Text will naturally flow around the floated image
+    }
+    &::after { // Clearfix for the float
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+/* Type 6: 100% Text */
+.layout-type-6 {
+    .text-content {
+        flex: 0 0 100%; // Take full width
+    }
+}
+
+/* Type 7: 100% Picture */
+.layout-type-7 {
+    .image-content {
+        flex: 0 0 100%; // Take full width
+        img {
+            width: 100%; // Ensure image fills container
+        }
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .container-layout {
+        flex-direction: column; // Stack vertically on small screens
+        .text-content,
+        .image-content,
+        .image-content-left,
+        .image-content-right {
+            flex: 0 0 100%; // Take full width
+            padding: 0;
+        }
+    }
+
+    .layout-type-2 {
+        flex-direction: column; // Ensure stacking for reversed layout
+    }
+
+    .layout-type-4, .layout-type-5, .layout-type-6, .layout-type-7 {
+        .image-content {
+            float: none; // Remove float on small screens
+            width: 100%; // Full width
+            margin-right: 0;
+            margin-left: 0;
+            margin-bottom: 15px;
+        }
+    }
+}

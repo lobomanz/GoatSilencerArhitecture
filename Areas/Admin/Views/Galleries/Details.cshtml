@@ -25,7 +25,7 @@
             if (img.FilePath != Model.MainImage) // avoid repeating main image
             {
                 <div class="col-md-3 mb-3 text-center">
-                    <img src="@img.FilePath" class="img-fluid img-thumbnail" style="max-height:200px; object-fit:cover;" />
+                    <img src="@img.FilePath" class="img-fluid img-thumbnail" style="max-height:200px; object-fit:cover;" alt="@img.AltText" />
                     @if (!string.IsNullOrEmpty(img.Caption))
                     {
                         <p>@img.Caption</p>
@@ -43,4 +43,6 @@ else
 <p>
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Gallery</a>
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</p>
+/a>
 </p>
