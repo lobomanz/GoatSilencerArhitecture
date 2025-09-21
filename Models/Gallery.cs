@@ -18,10 +18,11 @@ namespace GoatSilencerArchitecture.Models
         public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
 
         // New property for the project/service thumbnail (used in grids)
-        public string? MainImage { get; set; }
-        public string? MainImageAltText { get; set; } = string.Empty;
+        public string? MainImageLeft { get; set; }
+        public string? MainImageTopRight { get; set; }
+        public string? MainImageBottomRight { get; set; }
 
-        public ICollection<GalleryImage> Images { get; set; } = new List<GalleryImage>();
+        public List<GalleryImage> Images { get; set; } = new List<GalleryImage>();
         public string? RichTextContent { get; set; }
 
     }

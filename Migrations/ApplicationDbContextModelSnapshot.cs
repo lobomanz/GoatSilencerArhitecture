@@ -57,6 +57,33 @@ namespace GoatSilencerArchitecture.Migrations
                     b.ToTable("AboutComponents");
                 });
 
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.ContactInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContactInfos");
+                });
+
             modelBuilder.Entity("GoatSilencerArchitecture.Models.Gallery", b =>
                 {
                     b.Property<int>("Id")
@@ -72,10 +99,13 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("MainImage")
+                    b.Property<string>("MainImageBottomRight")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("MainImageAltText")
+                    b.Property<string>("MainImageLeft")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MainImageTopRight")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RichTextContent")
@@ -122,6 +152,9 @@ namespace GoatSilencerArchitecture.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("GalleryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsMainImage")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

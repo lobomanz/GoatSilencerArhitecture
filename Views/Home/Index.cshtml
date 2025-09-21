@@ -10,9 +10,7 @@
         {
             foreach (var project in Model)
             {
-                var img = !string.IsNullOrEmpty(project.MainImage)
-                    ? project.MainImage
-                    : (project.Images.Any() ? project.Images.First().FilePath : "/images/placeholder.jpg");
+                var img = project.MainImageLeft ?? project.MainImageTopRight ?? project.MainImageBottomRight ?? (project.Images.Any() ? project.Images.First().FilePath : "/images/placeholder.jpg");
 
                 <div class="slide" style="background-image: url('@Url.Content(img)')">
                     <div class="slide-content">

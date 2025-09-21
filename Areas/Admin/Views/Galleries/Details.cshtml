@@ -8,11 +8,33 @@
 
 <p>@Model.Description</p>
 
-@if (!string.IsNullOrEmpty(Model.MainImage))
+@if (!string.IsNullOrEmpty(Model.MainImageLeft) || !string.IsNullOrEmpty(Model.MainImageTopRight) || !string.IsNullOrEmpty(Model.MainImageBottomRight))
 {
-    <div class="mb-4 text-center">
-        <h5>Main Image</h5>
-        <img src="@Model.MainImage" class="img-fluid rounded shadow-sm" style="max-height:400px; object-fit:cover;" />
+    <div class="mb-4">
+        <h5>Main Images</h5>
+        <div class="row">
+            @if (!string.IsNullOrEmpty(Model.MainImageLeft))
+            {
+                <div class="col-md-4 text-center">
+                    <img src="@Model.MainImageLeft" class="img-fluid rounded shadow-sm" style="max-height:200px; object-fit:cover;" />
+                    <p>Left</p>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
+            {
+                <div class="col-md-4 text-center">
+                    <img src="@Model.MainImageTopRight" class="img-fluid rounded shadow-sm" style="max-height:200px; object-fit:cover;" />
+                    <p>Top Right</p>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
+            {
+                <div class="col-md-4 text-center">
+                    <img src="@Model.MainImageBottomRight" class="img-fluid rounded shadow-sm" style="max-height:200px; object-fit:cover;" />
+                    <p>Bottom Right</p>
+                </div>
+            }
+        </div>
     </div>
 }
 
@@ -22,7 +44,7 @@
     <div class="row">
         @foreach (var img in Model.Images)
         {
-            if (img.FilePath != Model.MainImage) // avoid repeating main image
+            if (img.FilePath != Model.MainImageLeft && img.FilePath != Model.MainImageTopRight && img.FilePath != Model.MainImageBottomRight) // avoid repeating main images
             {
                 <div class="col-md-3 mb-3 text-center">
                     <img src="@img.FilePath" class="img-fluid img-thumbnail" style="max-height:200px; object-fit:cover;" alt="@img.AltText" />

@@ -11,6 +11,7 @@ namespace GoatSilencerArchitecture.Models
         public string Caption { get; set; } = string.Empty;
         [Required]
         public string AltText { get; set; } = string.Empty;
+        public bool IsMainImage { get; set; } = false;
 
         public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 

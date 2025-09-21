@@ -89,7 +89,27 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         }
 
 
-        public async Task<IActionResult> Edit(int id,
+        // GET: Admin/AboutComponents/Edit/5
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var aboutComponent = await _context.AboutComponents.FindAsync(id);
+            if (aboutComponent == null)
+            {
+                return NotFound();
+            }
+            return View(aboutComponent);
+        }
+
+        // POST: Admin/AboutComponents/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, 
             [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc,Image1AltText,Image2AltText")] AboutComponent aboutComponent,
             IFormFile? image1File,
             IFormFile? image2File)

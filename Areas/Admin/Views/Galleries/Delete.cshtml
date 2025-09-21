@@ -17,15 +17,39 @@
         <dt class="col-sm-2">Description</dt>
         <dd class="col-sm-10">@Model.Description</dd>
 
-        <dt class="col-sm-2">Main Image</dt>
+        <dt class="col-sm-2">Main Image Left</dt>
         <dd class="col-sm-10">
-            @if (!string.IsNullOrEmpty(Model.MainImage))
+            @if (!string.IsNullOrEmpty(Model.MainImageLeft))
             {
-                <img src="@Model.MainImage" class="img-thumbnail" style="max-height:150px;" />
+                <img src="@Model.MainImageLeft" class="img-thumbnail" style="max-height:150px;" />
             }
             else
             {
-                <span>No main image</span>
+                <span>No main image left</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2">Main Image Top Right</dt>
+        <dd class="col-sm-10">
+            @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
+            {
+                <img src="@Model.MainImageTopRight" class="img-thumbnail" style="max-height:150px;" />
+            }
+            else
+            {
+                <span>No main image top right</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2">Main Image Bottom Right</dt>
+        <dd class="col-sm-10">
+            @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
+            {
+                <img src="@Model.MainImageBottomRight" class="img-thumbnail" style="max-height:150px;" />
+            }
+            else
+            {
+                <span>No main image bottom right</span>
             }
         </dd>
 

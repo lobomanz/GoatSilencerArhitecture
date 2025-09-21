@@ -51,7 +51,7 @@ body {
   align-items: center;
   margin-bottom: 40px;
   padding: 20px;
-  border: 1px solid #eee;
+  border: none;
   border-radius: 8px;
   gap: 20px;
 }

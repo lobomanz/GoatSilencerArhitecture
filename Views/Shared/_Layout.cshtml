@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+
+@{ 
+    var isAboutPage = ViewContext.RouteData.Values["controller"]?.ToString().Equals("About", StringComparison.OrdinalIgnoreCase) ?? false;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,9 +13,9 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body class="@(isAboutPage ? "bg-dark text-white" : "")">
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm custom-header-width-margin">
+        <nav class="navbar navbar-expand-lg @(isAboutPage ? "navbar-dark bg-dark" : "navbar-light bg-light") shadow-sm custom-header-width-margin">
             <div class="container-fluid">
                 <!-- Logo (left) -->
                 <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">

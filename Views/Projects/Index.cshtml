@@ -16,9 +16,12 @@
                     <a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id" class="text-decoration-none">
 
                         <!-- Main image with fallback -->
-                        @if (!string.IsNullOrEmpty(project.MainImage))
+                        @{
+                            var mainImageToDisplay = project.MainImageLeft ?? project.MainImageTopRight ?? project.MainImageBottomRight;
+                        }
+                        @if (!string.IsNullOrEmpty(mainImageToDisplay))
                         {
-                            <img src="@project.MainImage" class="card-img-top" style="object-fit: cover; height: 200px;" alt="@project.Title" />
+                            <img src="@mainImageToDisplay" class="card-img-top" style="object-fit: cover; height: 200px;" alt="@project.Title" />
                         }
                         else if (project.Images != null && project.Images.Any())
                         {

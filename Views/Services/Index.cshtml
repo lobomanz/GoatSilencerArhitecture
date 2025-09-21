@@ -17,9 +17,12 @@
                     <a asp-controller="Services" asp-action="Details" asp-route-id="@service.Id" class="text-decoration-none">
 
                         <!-- Main image with fallback -->
-                        @if (!string.IsNullOrEmpty(service.MainImage))
+                        @{
+                            var mainImageToDisplay = service.MainImageLeft ?? service.MainImageTopRight ?? service.MainImageBottomRight;
+                        }
+                        @if (!string.IsNullOrEmpty(mainImageToDisplay))
                         {
-                            <img src="@service.MainImage" class="card-img-top" style="object-fit: cover; height: 200px;" alt="@service.Title" />
+                            <img src="@mainImageToDisplay" class="card-img-top" style="object-fit: cover; height: 200px;" alt="@service.Title" />
                         }
                         else if (service.Images != null && service.Images.Any())
                         {

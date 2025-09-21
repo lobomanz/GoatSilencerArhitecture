@@ -1,18 +1,18 @@
 @model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = (ViewData["GalleryType"] as string) + " Galleries";
 }
 
-<h1>Galleries</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-success">Create New</a>
+    <a asp-action="Create" asp-route-type="@(ViewData["GalleryType"] as string)" class="btn btn-success">Create New</a>
 </p>
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Main Image</th>
+            <th>Main Images</th>
             <th>@Html.DisplayNameFor(model => model.Title)</th>
             <th>@Html.DisplayNameFor(model => model.Description)</th>
             <th>@Html.DisplayNameFor(model => model.IsPublished)</th>
@@ -27,9 +27,12 @@
         {
             <tr>
                 <td>
-                    @if (!string.IsNullOrEmpty(item.MainImage))
+                    @{
+                        var mainImageToDisplay = item.MainImageLeft ?? item.MainImageTopRight ?? item.MainImageBottomRight;
+                    }
+                    @if (!string.IsNullOrEmpty(mainImageToDisplay))
                     {
-                        <img src="@item.MainImage" class="img-thumbnail" style="max-height:60px;" alt="@item.MainImageAltText" />
+                        <img src="@mainImageToDisplay" class="img-thumbnail" style="max-height:60px;" alt="Main Image" />
                     }
                     else
                     {
