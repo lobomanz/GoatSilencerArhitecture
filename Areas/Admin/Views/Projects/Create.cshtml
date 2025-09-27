@@ -33,7 +33,6 @@
                 <textarea asp-for="RichTextContent" class="form-control rich-text-editor"></textarea>
                 <span asp-validation-for="RichTextContent" class="text-danger"></span>
             </div>
-            
 
             <div class="form-group">
                 <label asp-for="SortOrder" class="control-label"></label>
@@ -42,19 +41,61 @@
             </div>
 
             <!-- Main images -->
-            <div class="form-group">
-                <label asp-for="MainImageLeft" class="control-label"></label>
-                <input type="file" name="mainImageLeftFile" class="form-control" />
+            <div class="form-group d-flex flex-wrap">
+                <div class="col-md-6">
+                    <label asp-for="MainImageLeft" class="control-label"></label>
+                    <input type="file" name="mainImageLeftFile" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ImageLeftHeading" class="control-label"></label>
+                        <input asp-for="ImageLeftHeading" class="form-control" />
+                        <span asp-validation-for="ImageLeftHeading" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ImageLeftParagraph" class="control-label"></label>
+                        <textarea asp-for="ImageLeftParagraph" class="form-control"></textarea>
+                        <span asp-validation-for="ImageLeftParagraph" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label asp-for="MainImageTopRight" class="control-label"></label>
-                <input type="file" name="mainImageTopRightFile" class="form-control" />
+            <div class="form-group d-flex flex-wrap">
+                <div class="col-md-6">
+                    <label asp-for="MainImageTopRight" class="control-label"></label>
+                    <input type="file" name="mainImageTopRightFile" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ImageRightTopHeading" class="control-label"></label>
+                        <input asp-for="ImageRightTopHeading" class="form-control" />
+                        <span asp-validation-for="ImageRightTopHeading" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ImageRightTopParagraph" class="control-label"></label>
+                        <textarea asp-for="ImageRightTopParagraph" class="form-control"></textarea>
+                        <span asp-validation-for="ImageRightTopParagraph" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label asp-for="MainImageBottomRight" class="control-label"></label>
-                <input type="file" name="mainImageBottomRightFile" class="form-control" />
+            <div class="form-group d-flex flex-wrap">
+                <div class="col-md-6">
+                    <label asp-for="MainImageBottomRight" class="control-label"></label>
+                    <input type="file" name="mainImageBottomRightFile" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ImageRightBottomHeading" class="control-label"></label>
+                        <input asp-for="ImageRightBottomHeading" class="form-control" />
+                        <span asp-validation-for="ImageRightBottomHeading" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ImageRightBottomParagraph" class="control-label"></label>
+                        <textarea asp-for="ImageRightBottomParagraph" class="form-control"></textarea>
+                        <span asp-validation-for="ImageRightBottomParagraph" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
 
             

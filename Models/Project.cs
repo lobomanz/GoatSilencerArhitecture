@@ -25,5 +25,12 @@ namespace GoatSilencerArchitecture.Models
 
         [ValidateRichTextAccessibility]
         public string? RichTextContent { get; set; }
+
+        public string? ImageLeftHeading { get; set; }
+        public string? ImageRightTopHeading { get; set; }
+        public string? ImageRightBottomHeading { get; set; }
+        public string? ImageLeftParagraph { get; set; }
+        public string? ImageRightTopParagraph { get; set; }
+        public string? ImageRightBottomParagraph { get; set; }
     }
 }

@@ -49,7 +49,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Description,IsPublished,SortOrder,RichTextContent")] Project project,
+            [Bind("Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph")] Project project,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
             IFormFile? mainImageBottomRightFile,
@@ -124,7 +124,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent")] Project postedProject,
+            [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph")] Project postedProject,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
             IFormFile? mainImageBottomRightFile,
