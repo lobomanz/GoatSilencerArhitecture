@@ -4,6 +4,10 @@
     ViewData["Title"] = "Details";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/Projects/Shared.css" asp-append-version="true" />
+}
+
 <h1>Project Details</h1>
 <hr />
 
@@ -67,12 +71,4 @@
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
 
-<style>
-    .thumb-img {
-        width: 200px;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 6px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-</style>
+
