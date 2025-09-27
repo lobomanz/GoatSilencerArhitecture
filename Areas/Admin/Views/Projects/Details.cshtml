@@ -26,7 +26,6 @@
     </dl>
 </div>
 
-<!-- main images -->
 <h5>Main Images</h5>
 <div class="d-flex flex-wrap mb-3">
     @if (!string.IsNullOrEmpty(Model.MainImageLeft))
@@ -43,7 +42,6 @@
     }
 </div>
 
-<!-- rich text -->
 @if (!string.IsNullOrEmpty(Model.RichTextContent))
 {
     <h5>Content</h5>
@@ -52,7 +50,6 @@
     </div>
 }
 
-<!-- gallery -->
 <h5>Gallery Images</h5>
 <div class="row">
     @foreach (var img in Model.Images.OrderBy(i => i.SortOrder))
@@ -72,9 +69,9 @@
 
 <style>
     .thumb-img {
-        width: 400px;
-        height: 200px;
-        object-fit: contain;
+        width: 200px;
+        height: 100px;
+        object-fit: cover;
         border-radius: 6px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }

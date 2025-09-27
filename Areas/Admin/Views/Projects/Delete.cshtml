@@ -11,7 +11,6 @@
     <h4>@Model.Title</h4>
     <p>@Model.Description</p>
 
-    <!-- show main images -->
     <div class="mb-3">
         @if (!string.IsNullOrEmpty(Model.MainImageLeft))
         {
@@ -27,12 +26,11 @@
         }
     </div>
 
-    <!-- show gallery images -->
     <h5>Gallery Images</h5>
     <div class="row">
         @foreach (var img in Model.Images)
         {
-            <div class="col-md-3">
+            <div class="col-md-3 mb-3">
                 <img src="@img.ImageUrl" class="thumb-img" />
             </div>
         }
@@ -47,8 +45,8 @@
 
 <style>
     .thumb-img {
-        width: 400px;
-        height: 200px;
+        width: 200px;
+        height: 100px;
         object-fit: cover;
         border-radius: 6px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.15);

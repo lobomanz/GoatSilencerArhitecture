@@ -9,12 +9,15 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
         <form asp-action="Edit" enctype="multipart/form-data" id="edit-form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-
-            <!-- Basic fields -->
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsPublished" /> @Html.DisplayNameFor(m => m.IsPublished)
+                </label>
+            </div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -26,12 +29,13 @@
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsPublished" /> @Html.DisplayNameFor(m => m.IsPublished)
-                </label>
+            <div class="form-group">
+                <label asp-for="RichTextContent" class="control-label"></label>
+                <textarea asp-for="RichTextContent" class="form-control rich-text-editor"></textarea>
+                <span asp-validation-for="RichTextContent" class="text-danger"></span>
             </div>
+
+            
 
             <div class="form-group">
                 <label asp-for="SortOrder" class="control-label"></label>
@@ -39,13 +43,12 @@
                 <span asp-validation-for="SortOrder" class="text-danger"></span>
             </div>
 
-            <!-- Main images -->
             <div class="form-group">
                 <label asp-for="MainImageLeft" class="control-label"></label>
                 <input type="file" name="mainImageLeftFile" class="form-control" />
                 @if (!string.IsNullOrEmpty(Model.MainImageLeft))
                 {
-                    <img src="@Model.MainImageLeft" class="img-fluid mt-2" />
+                    <img src="@Model.MainImageLeft" class="thumb-img mt-2" />
                 }
             </div>
 
@@ -54,7 +57,7 @@
                 <input type="file" name="mainImageTopRightFile" class="form-control" />
                 @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
                 {
-                    <img src="@Model.MainImageTopRight" class="img-fluid mt-2" />
+                    <img src="@Model.MainImageTopRight" class="thumb-img mt-2" />
                 }
             </div>
 
@@ -63,26 +66,20 @@
                 <input type="file" name="mainImageBottomRightFile" class="form-control" />
                 @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
                 {
-                    <img src="@Model.MainImageBottomRight" class="img-fluid mt-2" />
+                    <img src="@Model.MainImageBottomRight" class="thumb-img mt-2" />
                 }
             </div>
 
-            <div class="form-group">
-                <label asp-for="RichTextContent" class="control-label"></label>
-                <textarea asp-for="RichTextContent" class="form-control"></textarea>
-                <span asp-validation-for="RichTextContent" class="text-danger"></span>
-            </div>
+            
 
-            <!-- Unified Images list -->
             <div class="form-group">
                 <label class="control-label">Images</label>
                 <input type="file" name="images" multiple class="form-control" id="images" />
-
                 <div id="images-list" class="row mt-2">
                     @foreach (var image in Model.Images)
                     {
                         <div class="col-md-4 image-item">
-                            <img src="@image.ImageUrl" class="mt-2" style="width:400px; height:200px; object-fit:contain; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" />
+                            <img src="@image.ImageUrl" class="thumb-img mt-2" />
                             <input type="hidden" name="existingImages" value="@image.ImageUrl" />
                             <button type="button" class="btn btn-warning btn-sm mt-1 remove-btn">Remove</button>
                         </div>
@@ -105,16 +102,25 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.tiny.cloud/1/5f03jnyxt3mkb0yuyavvuvvobp0a9y3zrrp1oqhu89aiwgmr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
+        tinymce.init({
+            selector: 'textarea.rich-text-editor',
+            height: 300,
+            menubar: false,
+            plugins: 'link image lists code table',
+            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+            block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4',
+            content_style: 'body { font-family: Arial, sans-serif; line-height: 1.6; font-size: 16px; }'
+        });
+
+        // Handle image preview and remove
         const fileInput = document.getElementById('images');
         const imagesList = document.getElementById('images-list');
 
-        // Append new selected images into the unified list
         fileInput.addEventListener('change', function (event) {
             for (let i = 0; i < event.target.files.length; i++) {
                 let file = event.target.files[i];
-                console.log("Selected file:", file.name);
-
                 let reader = new FileReader();
                 reader.onload = function (e) {
                     let wrapper = document.createElement('div');
@@ -122,13 +128,7 @@
 
                     let img = document.createElement('img');
                     img.src = e.target.result;
-                    img.classList.add('img-fluid');
-
-                    // hidden input to preserve file reference
-                    let hidden = document.createElement('input');
-                    hidden.type = "hidden";
-                    hidden.name = "newFiles";
-                    hidden.value = file.name; // just for debug – files still come via input
+                    img.classList.add('thumb-img', 'mt-2');
 
                     let btn = document.createElement('button');
                     btn.type = "button";
@@ -144,11 +144,19 @@
             }
         });
 
-        // Handle remove for existing images too
         document.querySelectorAll('.remove-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 this.closest('.image-item').remove();
             });
         });
     </script>
+    <style>
+        .thumb-img {
+            width: 200px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+    </style>
 }

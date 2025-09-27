@@ -39,7 +39,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View("~/Areas/Admin/Views/Projects/Details.cshtml", project);
         }
 
-
         // GET: Admin/Projects/Create
         public IActionResult Create()
         {
@@ -120,17 +119,18 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", project);
         }
 
+        // POST: Admin/Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
-    int id,
-    [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent")] Project postedProject,
-    IFormFile? mainImageLeftFile,
-    IFormFile? mainImageTopRightFile,
-    IFormFile? mainImageBottomRightFile,
-    List<IFormFile>? images,
-    string[]? existingImages
-)
+            int id,
+            [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent")] Project postedProject,
+            IFormFile? mainImageLeftFile,
+            IFormFile? mainImageTopRightFile,
+            IFormFile? mainImageBottomRightFile,
+            List<IFormFile>? images,
+            string[]? existingImages
+        )
         {
             var projectToUpdate = await _context.Projects
                 .Include(p => p.Images)
@@ -197,7 +197,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 }
 
                 // Replace list
-                _context.ProjectImages.RemoveRange(projectToUpdate.Images); // wipe old
+                _context.ProjectImages.RemoveRange(projectToUpdate.Images);
                 projectToUpdate.Images = unifiedImages;
 
                 await _context.SaveChangesAsync();
@@ -206,10 +206,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", projectToUpdate);
         }
-
-
-
-
 
         // GET: Admin/Projects/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -236,22 +232,16 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             if (project == null) return NotFound();
 
-            // remove associated images from DB
             if (project.Images.Any())
             {
                 _context.ProjectImages.RemoveRange(project.Images);
             }
-
-            // optionally: delete physical files via _imageService.DeleteImage(url);
-            // foreach (var img in project.Images) { await _imageService.DeleteImage(img.ImageUrl); }
 
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
-
-
 
         private bool ProjectExists(int id)
         {

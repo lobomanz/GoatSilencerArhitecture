@@ -9,10 +9,14 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Create" enctype="multipart/form-data" id="create-form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsPublished" /> @Html.DisplayNameFor(m => m.IsPublished)
+                </label>
+            </div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -24,12 +28,12 @@
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsPublished" /> @Html.DisplayNameFor(m => m.IsPublished)
-                </label>
+            <div class="form-group">
+                <label asp-for="RichTextContent" class="control-label"></label>
+                <textarea asp-for="RichTextContent" class="form-control rich-text-editor"></textarea>
+                <span asp-validation-for="RichTextContent" class="text-danger"></span>
             </div>
+            
 
             <div class="form-group">
                 <label asp-for="SortOrder" class="control-label"></label>
@@ -53,11 +57,7 @@
                 <input type="file" name="mainImageBottomRightFile" class="form-control" />
             </div>
 
-            <div class="form-group">
-                <label asp-for="RichTextContent" class="control-label"></label>
-                <textarea asp-for="RichTextContent" class="form-control"></textarea>
-                <span asp-validation-for="RichTextContent" class="text-danger"></span>
-            </div>
+            
 
             <!-- Unified images list -->
             <div class="form-group">
@@ -81,16 +81,24 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdn.tiny.cloud/1/5f03jnyxt3mkb0yuyavvuvvobp0a9y3zrrp1oqhu89aiwgmr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
+        tinymce.init({
+            selector: 'textarea.rich-text-editor',
+            height: 300,
+            menubar: false,
+            plugins: 'link image lists code table',
+            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+            block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4',
+            content_style: 'body { font-family: Arial, sans-serif; line-height: 1.6; font-size: 16px; }'
+        });
+
         const fileInput = document.getElementById('images');
         const imagesList = document.getElementById('images-list');
 
-        // Append new selected images into the unified list
         fileInput.addEventListener('change', function (event) {
             for (let i = 0; i < event.target.files.length; i++) {
                 let file = event.target.files[i];
-                console.log("Selected file:", file.name);
-
                 let reader = new FileReader();
                 reader.onload = function (e) {
                     let wrapper = document.createElement('div');
@@ -116,9 +124,9 @@
     </script>
     <style>
         .thumb-img {
-            width: 400px;
-            height: 200px;
-            object-fit: contain;
+            width: 200px;
+            height: 100px;
+            object-fit: cover;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
