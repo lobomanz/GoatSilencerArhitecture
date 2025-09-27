@@ -2,12 +2,62 @@
 
 @{
     ViewData["Title"] = "Projects";
+    var currentSort = ViewData["CurrentSort"] as string;
+
+    string GetSortIndicator(string sortParam)
+    {
+        // Default sort = UpdatedUtc descending
+        if (string.IsNullOrEmpty(currentSort) && sortParam == "UpdatedUtc")
+            return " &#9660;"; 
+
+        if (currentSort == sortParam)
+            return " &#9650;"; 
+
+        // Check the *_desc version
+        var descParam = char.ToLower(sortParam[0]) + sortParam.Substring(1) + "_desc";
+        if (currentSort == descParam)
+            return " &#9660;"; 
+
+        return "";
+    }
+
+    string GetSortClass(string sortParam)
+    {
+        if (string.IsNullOrEmpty(currentSort) && sortParam == "UpdatedUtc")
+            return "sort-active";
+
+        var descParam = char.ToLower(sortParam[0]) + sortParam.Substring(1) + "_desc";
+        if (currentSort == sortParam || currentSort == descParam)
+            return "sort-active";
+
+        return "";
+    }
 }
+
+<style>
+    .sort-active {
+        background-color: #f0f0f0;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+
+    .sort-link {
+        color: black;
+        text-decoration: none;
+        padding: 4px 6px;
+        border-radius: 4px;
+    }
+
+        .sort-link:hover {
+            background-color: #e0e0e0;
+            text-decoration: underline;
+        }
+</style>
 
 <h1>Projects</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 
 <form asp-action="Index" method="get">
@@ -23,8 +73,14 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["SortOrderSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model.FirstOrDefault().SortOrder)</a>
+            <th class="@GetSortClass("SortOrder")">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["SortOrderSortParm"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="sort-link">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().SortOrder)
+                    @Html.Raw(GetSortIndicator("SortOrder"))
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.FirstOrDefault().Title)
@@ -32,11 +88,23 @@
             <th>
                 @Html.DisplayNameFor(model => model.FirstOrDefault().IsPublished)
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["CreatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model.FirstOrDefault().CreatedUtc)</a>
+            <th class="@GetSortClass("CreatedUtc")">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CreatedUtcSortParm"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="sort-link">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().CreatedUtc)
+                    @Html.Raw(GetSortIndicator("CreatedUtc"))
+                </a>
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["UpdatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model.FirstOrDefault().UpdatedUtc)</a>
+            <th class="@GetSortClass("UpdatedUtc")">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["UpdatedUtcSortParm"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="sort-link">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().UpdatedUtc)
+                    @Html.Raw(GetSortIndicator("UpdatedUtc"))
+                </a>
             </th>
             <th></th>
         </tr>
@@ -45,21 +113,11 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SortOrder)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsPublished)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedUtc)s
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UpdatedUtc)
-                </td>
+                <td>@Html.DisplayFor(modelItem => item.SortOrder)</td>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.IsPublished)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatedUtc)</td>
+                <td>@Html.DisplayFor(modelItem => item.UpdatedUtc)</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
