@@ -1,6 +1,7 @@
 using GoatSilencerArchitecture.Data;
 using GoatSilencerArchitecture.Models;
 using GoatSilencerArchitecture.Services;
+using GoatSilencerArchitecture.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -20,9 +21,60 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         }
 
         // GET: Admin/Projects
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            return View("~/Areas/Admin/Views/Projects/Index.cshtml", await _context.Projects.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["SortOrderSortParm"] = String.IsNullOrEmpty(sortOrder) ? "sortOrder_desc" : "";
+            ViewData["UpdatedUtcSortParm"] = sortOrder == "UpdatedUtc" ? "updatedUtc_desc" : "UpdatedUtc";
+            ViewData["CreatedUtcSortParm"] = sortOrder == "CreatedUtc" ? "createdUtc_desc" : "CreatedUtc";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var projects = from p in _context.Projects
+                           select p;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                projects = projects.Where(p => p.Title.Contains(searchString)
+                                       || p.Description.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "sortOrder_desc":
+                    projects = projects.OrderByDescending(p => p.SortOrder);
+                    break;
+                case "SortOrder":
+                    projects = projects.OrderBy(p => p.SortOrder);
+                    break;
+                case "updatedUtc_desc":
+                    projects = projects.OrderByDescending(p => p.UpdatedUtc);
+                    break;
+                case "UpdatedUtc":
+                    projects = projects.OrderBy(p => p.UpdatedUtc);
+                    break;
+                case "createdUtc_desc":
+                    projects = projects.OrderByDescending(p => p.CreatedUtc);
+                    break;
+                case "CreatedUtc":
+                    projects = projects.OrderBy(p => p.CreatedUtc);
+                    break;
+                default:
+                    projects = projects.OrderByDescending(p => p.UpdatedUtc); // Default sort by last updated
+                    break;
+            }
+
+            int pageSize = 10; // You can adjust this as needed
+            return View("~/Areas/Admin/Views/Projects/Index.cshtml", await PaginatedList<Project>.CreateAsync(projects.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Admin/Projects/Details/5
@@ -40,9 +92,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         }
 
         // GET: Admin/Projects/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View("~/Areas/Admin/Views/Projects/Create.cshtml", new Project());
+            var project = new Project();
+            var maxSortOrder = await _context.Projects.MaxAsync(p => (int?)p.SortOrder) ?? 0;
+            project.SortOrder = maxSortOrder + 1;
+            return View("~/Areas/Admin/Views/Projects/Create.cshtml", project);
         }
 
         // POST: Admin/Projects/Create

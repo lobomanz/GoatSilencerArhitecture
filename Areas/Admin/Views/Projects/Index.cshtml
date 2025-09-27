@@ -1,23 +1,42 @@
-@model IEnumerable<GoatSilencerArchitecture.Models.Project>
+@model GoatSilencerArchitecture.Utilities.PaginatedList<GoatSilencerArchitecture.Models.Project>
 
-@{ ViewData["Title"] = "Projects"; }
+@{
+    ViewData["Title"] = "Projects";
+}
 
 <h1>Projects</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["SortOrderSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model.FirstOrDefault().SortOrder)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsPublished)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SortOrder)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().IsPublished)
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CreatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model.FirstOrDefault().CreatedUtc)</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["UpdatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">@Html.DisplayNameFor(model => model.FirstOrDefault().UpdatedUtc)</a>
             </th>
             <th></th>
         </tr>
@@ -27,13 +46,19 @@
         {
             <tr>
                 <td>
+                    @Html.DisplayFor(modelItem => item.SortOrder)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.IsPublished)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.SortOrder)
+                    @Html.DisplayFor(modelItem => item.CreatedUtc)s
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdatedUtc)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -44,3 +69,23 @@
         }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
