@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using GoatSilencerArchitecture.Data;
 using GoatSilencerArchitecture.Services;
+using GoatSilencerArchitecture.Services.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +15,13 @@ var dbPath = Path.Combine(builder.Environment.ContentRootPath, connectionString!
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Register services
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IImageService, ImageService>();
+
+// Register RichText validator
+builder.Services.AddScoped<IRichTextValidator, RichTextValidator>();
 
 var app = builder.Build();
 
@@ -39,6 +44,7 @@ app.UseStaticFiles(new StaticFileOptions
         }
     }
 });
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

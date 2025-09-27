@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GoatSilencerArchitecture.Services.Validation;
 
 namespace GoatSilencerArchitecture.Models
 {
@@ -21,6 +22,8 @@ namespace GoatSilencerArchitecture.Models
         public string? MainImageBottomRight { get; set; }
 
         public List<ProjectImage> Images { get; set; } = new List<ProjectImage>();
+
+        [ValidateRichTextAccessibility]
         public string? RichTextContent { get; set; }
     }
 }
