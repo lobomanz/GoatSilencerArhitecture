@@ -1,76 +1,81 @@
 @model GoatSilencerArchitecture.Models.Project
 
-@{ ViewData["Title"] = "Details"; }
+@{
+    ViewData["Title"] = "Details";
+}
 
-<h1>Details</h1>
+<h1>Project Details</h1>
+<hr />
 
-<div>
-    <h4>Project</h4>
-    <hr />
+<div class="mb-3">
+    <h4>@Model.Title</h4>
+    <p>@Model.Description</p>
+
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.IsPublished)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.IsPublished)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SortOrder)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.SortOrder)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.MainImageLeft)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.MainImageLeft)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.MainImageTopRight)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.MainImageTopRight)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.MainImageBottomRight)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.MainImageBottomRight)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.RichTextContent)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.Raw(Model.RichTextContent)
-        </dd>
+        <dt class="col-sm-2">Published</dt>
+        <dd class="col-sm-10">@Model.IsPublished</dd>
+
+        <dt class="col-sm-2">Sort Order</dt>
+        <dd class="col-sm-10">@Model.SortOrder</dd>
+
+        <dt class="col-sm-2">Created</dt>
+        <dd class="col-sm-10">@Model.CreatedUtc.ToString("g")</dd>
+
+        <dt class="col-sm-2">Updated</dt>
+        <dd class="col-sm-10">@Model.UpdatedUtc.ToString("g")</dd>
     </dl>
 </div>
-<div>
-    <h4>Images</h4>
-    <hr />
-    <div class="row">
-        @foreach (var image in Model.Images)
-        {
-            <div class="col-md-4">
-                <img src="@image.ImageUrl" class="img-fluid" alt="@image.AltText" title="@image.Title" />
-            </div>
-        }
+
+<!-- main images -->
+<h5>Main Images</h5>
+<div class="d-flex flex-wrap mb-3">
+    @if (!string.IsNullOrEmpty(Model.MainImageLeft))
+    {
+        <img src="@Model.MainImageLeft" class="thumb-img me-2 mb-2" />
+    }
+    @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
+    {
+        <img src="@Model.MainImageTopRight" class="thumb-img me-2 mb-2" />
+    }
+    @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
+    {
+        <img src="@Model.MainImageBottomRight" class="thumb-img me-2 mb-2" />
+    }
+</div>
+
+<!-- rich text -->
+@if (!string.IsNullOrEmpty(Model.RichTextContent))
+{
+    <h5>Content</h5>
+    <div class="border p-3 mb-3">
+        @Html.Raw(Model.RichTextContent)
     </div>
+}
+
+<!-- gallery -->
+<h5>Gallery Images</h5>
+<div class="row">
+    @foreach (var img in Model.Images.OrderBy(i => i.SortOrder))
+    {
+        <div class="col-md-3 mb-3">
+            <img src="@img.ImageUrl" class="thumb-img" />
+            <div class="text-muted small">@img.Title</div>
+        </div>
+    }
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
+
+<style>
+    .thumb-img {
+        width: 400px;
+        height: 200px;
+        object-fit: contain;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+</style>

@@ -28,32 +28,34 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         // GET: Admin/Projects/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var project = await _context.Projects
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Details.cshtml", project);
         }
 
+
         // GET: Admin/Projects/Create
         public IActionResult Create()
         {
-            return View("~/Areas/Admin/Views/Projects/Create.cshtml");
+            return View("~/Areas/Admin/Views/Projects/Create.cshtml", new Project());
         }
 
         // POST: Admin/Projects/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent")] Project project, List<IFormFile> images, IFormFile mainImageLeftFile, IFormFile mainImageTopRightFile, IFormFile mainImageBottomRightFile)
+        public async Task<IActionResult> Create(
+            [Bind("Title,Description,IsPublished,SortOrder,RichTextContent")] Project project,
+            IFormFile? mainImageLeftFile,
+            IFormFile? mainImageTopRightFile,
+            IFormFile? mainImageBottomRightFile,
+            List<IFormFile>? images
+        )
         {
             if (ModelState.IsValid)
             {
@@ -61,46 +63,49 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 project.UpdatedUtc = DateTime.UtcNow;
 
                 if (mainImageLeftFile != null)
-                {
                     project.MainImageLeft = await _imageService.SaveAndCompressImage(mainImageLeftFile);
-                }
 
                 if (mainImageTopRightFile != null)
-                {
                     project.MainImageTopRight = await _imageService.SaveAndCompressImage(mainImageTopRightFile);
-                }
 
                 if (mainImageBottomRightFile != null)
-                {
                     project.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
-                }
 
-                if (images != null && images.Count > 0)
+                // Handle gallery images
+                var gallery = new List<ProjectImage>();
+                int sortOrder = 0;
+
+                if (images != null && images.Any())
                 {
-                    foreach (var image in images)
+                    foreach (var file in images)
                     {
-                        var imageUrl = await _imageService.SaveAndCompressImage(image);
-                        if (imageUrl != null)
-                        {
-                            var imageName = Path.GetFileNameWithoutExtension(image.FileName);
-                            var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
+                        var url = await _imageService.SaveAndCompressImage(file);
+                        if (url == null) continue;
 
-                            project.Images.Add(new ProjectImage
-                            {
-                                ImageUrl = imageUrl,
-                                Title = title,
-                                AltText = title
-                            });
-                        }
+                        var imageName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
+
+                        gallery.Add(new ProjectImage
+                        {
+                            ImageUrl = url,
+                            Title = title,
+                            AltText = title,
+                            SortOrder = sortOrder++
+                        });
                     }
                 }
 
-                _context.Add(project);
+                project.Images = gallery;
+
+                _context.Projects.Add(project);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View("~/Areas/Admin/Views/Projects/Create.cshtml", project);
         }
+
         // GET: Admin/Projects/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -209,42 +214,44 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         // GET: Admin/Projects/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var project = await _context.Projects
+                .Include(p => p.Images)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
+
+            if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Delete.cshtml", project);
         }
 
         // POST: Admin/Projects/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var project = await _context.Projects.Include(p => p.Images).FirstOrDefaultAsync(p => p.Id == id);
-            if (project != null)
-            {
-                foreach (var image in project.Images)
-                {
-                    _imageService.DeleteImageFiles(image.ImageUrl);
-                }
+            var project = await _context.Projects
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-                _context.Projects.Remove(project);
+            if (project == null) return NotFound();
+
+            // remove associated images from DB
+            if (project.Images.Any())
+            {
+                _context.ProjectImages.RemoveRange(project.Images);
             }
 
+            // optionally: delete physical files via _imageService.DeleteImage(url);
+            // foreach (var img in project.Images) { await _imageService.DeleteImage(img.ImageUrl); }
+
+            _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
-       
+
 
         private bool ProjectExists(int id)
         {
