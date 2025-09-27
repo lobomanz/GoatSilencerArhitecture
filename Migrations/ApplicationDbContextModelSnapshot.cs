@@ -84,7 +84,7 @@ namespace GoatSilencerArchitecture.Migrations
                     b.ToTable("ContactInfos");
                 });
 
-            modelBuilder.Entity("GoatSilencerArchitecture.Models.Gallery", b =>
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,50 +118,41 @@ namespace GoatSilencerArchitecture.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("UpdatedUtc")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Galleries");
+                    b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("GoatSilencerArchitecture.Models.GalleryImage", b =>
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.ProjectImage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("AltText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Caption")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("GalleryId")
+                    b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsMainImage")
+                    b.Property<int>("SortOrder")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GalleryId");
+                    b.HasIndex("ProjectId");
 
-                    b.ToTable("GalleryImages");
+                    b.ToTable("ProjectImages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -356,15 +347,15 @@ namespace GoatSilencerArchitecture.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("GoatSilencerArchitecture.Models.GalleryImage", b =>
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.ProjectImage", b =>
                 {
-                    b.HasOne("GoatSilencerArchitecture.Models.Gallery", "Gallery")
+                    b.HasOne("GoatSilencerArchitecture.Models.Project", "Project")
                         .WithMany("Images")
-                        .HasForeignKey("GalleryId")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Gallery");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -418,7 +409,7 @@ namespace GoatSilencerArchitecture.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("GoatSilencerArchitecture.Models.Gallery", b =>
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.Project", b =>
                 {
                     b.Navigation("Images");
                 });

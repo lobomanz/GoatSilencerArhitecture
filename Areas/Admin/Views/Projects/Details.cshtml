@@ -1,0 +1,76 @@
+@model GoatSilencerArchitecture.Models.Project
+
+@{ ViewData["Title"] = "Details"; }
+
+<h1>Details</h1>
+
+<div>
+    <h4>Project</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsPublished)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IsPublished)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SortOrder)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SortOrder)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MainImageLeft)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MainImageLeft)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MainImageTopRight)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MainImageTopRight)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MainImageBottomRight)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MainImageBottomRight)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RichTextContent)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.Raw(Model.RichTextContent)
+        </dd>
+    </dl>
+</div>
+<div>
+    <h4>Images</h4>
+    <hr />
+    <div class="row">
+        @foreach (var image in Model.Images)
+        {
+            <div class="col-md-4">
+                <img src="@image.ImageUrl" class="img-fluid" alt="@image.AltText" title="@image.Title" />
+            </div>
+        }
+    </div>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

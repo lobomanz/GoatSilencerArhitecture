@@ -16,8 +16,8 @@ namespace GoatSilencerArchitecture.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Only published galleries (projects)
-            var projects = await _context.Galleries
+            // Only published Projects (projects)
+            var projects = await _context.Projects
                 .Include(g => g.Images)
                 .Where(g => g.IsPublished)
                 .OrderByDescending(g => g.UpdatedUtc)

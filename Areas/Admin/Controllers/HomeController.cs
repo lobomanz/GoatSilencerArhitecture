@@ -16,15 +16,15 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var galleries = await _context.Galleries
+            var projects = await _context.Projects
                 .Include(g => g.Images)
                 .OrderByDescending(g => g.UpdatedUtc)
                 .ToListAsync();
 
-            // Show last 3 updated galleries as "featured"
-            ViewData["FeaturedGalleries"] = galleries.Take(3).ToList();
+            // Show last 3 updated projects as "featured"
+            ViewData["FeaturedProjects"] = projects.Take(3).ToList();
 
-            return View(galleries);
+            return View(projects);
         }
     }
 }

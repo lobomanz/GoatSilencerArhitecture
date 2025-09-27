@@ -1,0 +1,154 @@
+@model GoatSilencerArchitecture.Models.Project
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+<h4>Project</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="Edit" enctype="multipart/form-data" id="edit-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <!-- Basic fields -->
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsPublished" /> @Html.DisplayNameFor(m => m.IsPublished)
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SortOrder" class="control-label"></label>
+                <input asp-for="SortOrder" class="form-control" />
+                <span asp-validation-for="SortOrder" class="text-danger"></span>
+            </div>
+
+            <!-- Main images -->
+            <div class="form-group">
+                <label asp-for="MainImageLeft" class="control-label"></label>
+                <input type="file" name="mainImageLeftFile" class="form-control" />
+                @if (!string.IsNullOrEmpty(Model.MainImageLeft))
+                {
+                    <img src="@Model.MainImageLeft" class="img-fluid mt-2" />
+                }
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MainImageTopRight" class="control-label"></label>
+                <input type="file" name="mainImageTopRightFile" class="form-control" />
+                @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
+                {
+                    <img src="@Model.MainImageTopRight" class="img-fluid mt-2" />
+                }
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MainImageBottomRight" class="control-label"></label>
+                <input type="file" name="mainImageBottomRightFile" class="form-control" />
+                @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
+                {
+                    <img src="@Model.MainImageBottomRight" class="img-fluid mt-2" />
+                }
+            </div>
+
+            <div class="form-group">
+                <label asp-for="RichTextContent" class="control-label"></label>
+                <textarea asp-for="RichTextContent" class="form-control"></textarea>
+                <span asp-validation-for="RichTextContent" class="text-danger"></span>
+            </div>
+
+            <!-- Unified Images list -->
+            <div class="form-group">
+                <label class="control-label">Images</label>
+                <input type="file" name="images" multiple class="form-control" id="images" />
+
+                <div id="images-list" class="row mt-2">
+                    @foreach (var image in Model.Images)
+                    {
+                        <div class="col-md-4 image-item">
+                            <img src="@image.ImageUrl" class="mt-2" style="width:400px; height:200px; object-fit:contain; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" />
+                            <input type="hidden" name="existingImages" value="@image.ImageUrl" />
+                            <button type="button" class="btn btn-warning btn-sm mt-1 remove-btn">Remove</button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        const fileInput = document.getElementById('images');
+        const imagesList = document.getElementById('images-list');
+
+        // Append new selected images into the unified list
+        fileInput.addEventListener('change', function (event) {
+            for (let i = 0; i < event.target.files.length; i++) {
+                let file = event.target.files[i];
+                console.log("Selected file:", file.name);
+
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    let wrapper = document.createElement('div');
+                    wrapper.classList.add('col-md-4', 'image-item');
+
+                    let img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('img-fluid');
+
+                    // hidden input to preserve file reference
+                    let hidden = document.createElement('input');
+                    hidden.type = "hidden";
+                    hidden.name = "newFiles";
+                    hidden.value = file.name; // just for debug – files still come via input
+
+                    let btn = document.createElement('button');
+                    btn.type = "button";
+                    btn.classList.add('btn', 'btn-warning', 'btn-sm', 'mt-1', 'remove-btn');
+                    btn.innerText = "Remove";
+                    btn.onclick = () => wrapper.remove();
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(btn);
+                    imagesList.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle remove for existing images too
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                this.closest('.image-item').remove();
+            });
+        });
+    </script>
+}

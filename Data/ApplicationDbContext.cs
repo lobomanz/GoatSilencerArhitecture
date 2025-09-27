@@ -9,8 +9,8 @@ namespace GoatSilencerArchitecture.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
 
-        public DbSet<Gallery> Galleries { get; set; }
-        public DbSet<GalleryImage> GalleryImages { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectImage> ProjectImages { get; set; }
         public DbSet<AboutComponent> AboutComponents { get; set; }
         public DbSet<ContactInfo> ContactInfos { get; set; }
     }

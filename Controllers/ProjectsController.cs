@@ -16,9 +16,8 @@ namespace GoatSilencerArchitecture.Controllers
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            var projects = await _context.Galleries
+            var projects = await _context.Projects
                 .Include(g => g.Images)
-                .Where(g => g.IsPublished && g.Type == "Project")
                 .OrderBy(g => g.SortOrder)
                 .ToListAsync();
 
@@ -29,7 +28,7 @@ namespace GoatSilencerArchitecture.Controllers
         // GET: Projects/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var project = await _context.Galleries
+            var project = await _context.Projects
                 .Include(g => g.Images) // assuming Gallery has Images navigation
                 .FirstOrDefaultAsync(g => g.Id == id && g.IsPublished);
 

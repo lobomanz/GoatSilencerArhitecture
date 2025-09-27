@@ -1,15 +1,15 @@
-﻿@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
+﻿@model IEnumerable<GoatSilencerArchitecture.Models.Project>
 
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 
-    var featured = ViewData["FeaturedGalleries"] as List<GoatSilencerArchitecture.Models.Gallery>;
+    var featured = ViewData["FeaturedProjects"] as List<GoatSilencerArchitecture.Models.Project>;
 }
 
 <div class="text-center mb-4">
     <h1 class="display-4">Welcome to GoatSilencer Architecture</h1>
-    <p>Explore our latest galleries below!</p>
+    <p>Explore our latest projects below!</p>
 </div>
 
 @if (featured != null && featured.Any())
@@ -22,7 +22,7 @@
                 <div class="carousel-item @(i == 0 ? "active" : "")">
                     @if (gallery.Images != null && gallery.Images.Any())
                     {
-                        <img src="@gallery.Images.First().FilePath" class="d-block w-100" style="height:400px; object-fit:cover;" alt="@gallery.Title" />
+                        <img src="@gallery.Images.First().ImageUrl" class="d-block w-100" style="height:400px; object-fit:cover;" alt="@gallery.Title" />
                     }
                     else
                     {
@@ -31,7 +31,7 @@
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>@gallery.Title</h5>
                         <p>@gallery.Description</p>
-                        <a asp-controller="Galleries" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-sm btn-light">View Gallery</a>
+                        <a asp-controller="Projects" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-sm btn-light">View Gallery</a>
                     </div>
                 </div>
             }
@@ -56,7 +56,7 @@
                 <div class="card shadow-sm">
                     @if (gallery.Images != null && gallery.Images.Any())
                     {
-                        <img src="@gallery.Images.First().FilePath" class="card-img-top" style="height:200px; object-fit:cover;" />
+                        <img src="@gallery.Images.First().ImageUrl" class="card-img-top" style="height:200px; object-fit:cover;" />
                     }
                     else
                     {
@@ -65,7 +65,7 @@
                     <div class="card-body">
                         <h5 class="card-title">@gallery.Title</h5>
                         <p class="card-text text-truncate">@gallery.Description</p>
-                        <a asp-controller="Galleries" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-primary btn-sm">View</a>
+                        <a asp-controller="Projects" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-primary btn-sm">View</a>
                     </div>
                 </div>
             </div>
@@ -74,5 +74,5 @@
 }
 else
 {
-    <p class="text-center">No galleries available at the moment.</p>
+    <p class="text-center">No projects available at the moment.</p>
 }

@@ -1,4 +1,4 @@
-@model IEnumerable<GoatSilencerArchitecture.Models.Gallery>
+@model IEnumerable<GoatSilencerArchitecture.Models.Project>
 @{
     ViewData["Title"] = "Welcome";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -10,7 +10,7 @@
         {
             foreach (var project in Model)
             {
-                var img = project.MainImageLeft ?? project.MainImageTopRight ?? project.MainImageBottomRight ?? (project.Images.Any() ? project.Images.First().FilePath : "/images/placeholder.jpg");
+                var img = project.MainImageLeft ?? project.MainImageTopRight ?? project.MainImageBottomRight ?? (project.Images.Any() ? project.Images.First().ImageUrl : "/images/placeholder.jpg");
 
                 <div class="slide" style="background-image: url('@Url.Content(img)')">
                     <div class="slide-content">
