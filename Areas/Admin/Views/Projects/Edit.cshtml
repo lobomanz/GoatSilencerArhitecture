@@ -35,16 +35,13 @@
                 <span asp-validation-for="RichTextContent" class="text-danger"></span>
             </div>
 
-
-
-            
-
             <div class="form-group">
                 <label asp-for="SortOrder" class="control-label"></label>
                 <input asp-for="SortOrder" class="form-control" />
                 <span asp-validation-for="SortOrder" class="text-danger"></span>
             </div>
 
+            <!-- Main Image Left -->
             <div class="form-group d-flex flex-wrap">
                 <div class="col-md-6">
                     <label asp-for="MainImageLeft" class="control-label"></label>
@@ -68,6 +65,7 @@
                 </div>
             </div>
 
+            <!-- Main Image Top Right -->
             <div class="form-group d-flex flex-wrap">
                 <div class="col-md-6">
                     <label asp-for="MainImageTopRight" class="control-label"></label>
@@ -91,6 +89,7 @@
                 </div>
             </div>
 
+            <!-- Main Image Bottom Right -->
             <div class="form-group d-flex flex-wrap">
                 <div class="col-md-6">
                     <label asp-for="MainImageBottomRight" class="control-label"></label>
@@ -111,23 +110,6 @@
                         <textarea asp-for="ImageRightBottomParagraph" class="form-control"></textarea>
                         <span asp-validation-for="ImageRightBottomParagraph" class="text-danger"></span>
                     </div>
-                </div>
-            </div>
-
-            
-
-            <div class="form-group">
-                <label class="control-label">Images</label>
-                <input type="file" name="images" multiple class="form-control" id="images" />
-                <div id="images-list" class="row mt-2">
-                    @foreach (var image in Model.Images)
-                    {
-                        <div class="col-md-4 image-item">
-                            <img src="@image.ImageUrl" class="thumb-img mt-2" />
-                            <input type="hidden" name="existingImages" value="@image.ImageUrl" />
-                            <button type="button" class="btn btn-warning btn-sm mt-1 remove-btn">Remove</button>
-                        </div>
-                    }
                 </div>
             </div>
 
@@ -161,42 +143,5 @@
             block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4',
             content_style: 'body { font-family: Arial, sans-serif; line-height: 1.6; font-size: 16px; }'
         });
-
-        // Handle image preview and remove
-        const fileInput = document.getElementById('images');
-        const imagesList = document.getElementById('images-list');
-
-        fileInput.addEventListener('change', function (event) {
-            for (let i = 0; i < event.target.files.length; i++) {
-                let file = event.target.files[i];
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    let wrapper = document.createElement('div');
-                    wrapper.classList.add('col-md-4', 'image-item');
-
-                    let img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.classList.add('thumb-img', 'mt-2');
-
-                    let btn = document.createElement('button');
-                    btn.type = "button";
-                    btn.classList.add('btn', 'btn-warning', 'btn-sm', 'mt-1', 'remove-btn');
-                    btn.innerText = "Remove";
-                    btn.onclick = () => wrapper.remove();
-
-                    wrapper.appendChild(img);
-                    wrapper.appendChild(btn);
-                    imagesList.appendChild(wrapper);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.querySelectorAll('.remove-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                this.closest('.image-item').remove();
-            });
-        });
     </script>
-
 }

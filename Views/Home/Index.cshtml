@@ -10,7 +10,10 @@
         {
             foreach (var project in Model)
             {
-                var img = project.MainImageLeft ?? project.MainImageTopRight ?? project.MainImageBottomRight ?? (project.Images.Any() ? project.Images.First().ImageUrl : "/images/placeholder.jpg");
+                var img = project.MainImageLeft
+                ?? project.MainImageTopRight
+                ?? project.MainImageBottomRight
+                ?? "/images/placeholder.jpg";
 
                 <div class="slide" style="background-image: url('@Url.Content(img)')">
                     <div class="slide-content">
@@ -29,7 +32,7 @@
             for (int i = 0; i < Model.Count(); i++)
             {
                 <div class="dot-container" data-index="@i" role="button" aria-label="Go to slide @(i + 1)" tabindex="0">
-                    <div class="dot" ></div>
+                    <div class="dot"></div>
                 </div>
             }
         }

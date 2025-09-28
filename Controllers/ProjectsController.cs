@@ -17,20 +17,18 @@ namespace GoatSilencerArchitecture.Controllers
         public async Task<IActionResult> Index()
         {
             var projects = await _context.Projects
-                .Include(g => g.Images)
-                .OrderBy(g => g.SortOrder)
+                .Where(p => p.IsPublished) // only published projects on public side
+                .OrderBy(p => p.SortOrder)
                 .ToListAsync();
 
             return View(projects);
         }
 
-
         // GET: Projects/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var project = await _context.Projects
-                .Include(g => g.Images) // assuming Gallery has Images navigation
-                .FirstOrDefaultAsync(g => g.Id == id && g.IsPublished);
+                .FirstOrDefaultAsync(p => p.Id == id && p.IsPublished);
 
             if (project == null)
                 return NotFound();

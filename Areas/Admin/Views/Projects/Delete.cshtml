@@ -26,16 +26,6 @@
         }
     </div>
 
-    <h5>Gallery Images</h5>
-    <div class="row">
-        @foreach (var img in Model.Images)
-        {
-            <div class="col-md-3 mb-3">
-                <img src="@img.ImageUrl" class="thumb-img" />
-            </div>
-        }
-    </div>
-
     <form asp-action="DeleteConfirmed" method="post">
         <input type="hidden" asp-for="Id" />
         <button type="submit" class="btn btn-danger mt-3">Delete</button>

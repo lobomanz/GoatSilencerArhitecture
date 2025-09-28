@@ -4,7 +4,6 @@ using GoatSilencerArchitecture.Services;
 using GoatSilencerArchitecture.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
@@ -42,7 +41,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             var projects = from p in _context.Projects
                            select p;
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
                 projects = projects.Where(p => p.Title.Contains(searchString)
                                        || p.Description.Contains(searchString));
@@ -73,8 +72,9 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                     break;
             }
 
-            int pageSize = 10; // You can adjust this as needed
-            return View("~/Areas/Admin/Views/Projects/Index.cshtml", await PaginatedList<Project>.CreateAsync(projects.AsNoTracking(), pageNumber ?? 1, pageSize));
+            int pageSize = 10;
+            return View("~/Areas/Admin/Views/Projects/Index.cshtml",
+                await PaginatedList<Project>.CreateAsync(projects.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Admin/Projects/Details/5
@@ -83,7 +83,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             if (id == null) return NotFound();
 
             var project = await _context.Projects
-                .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null) return NotFound();
@@ -107,8 +106,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             [Bind("Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph")] Project project,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
-            IFormFile? mainImageBottomRightFile,
-            List<IFormFile>? images
+            IFormFile? mainImageBottomRightFile
         )
         {
             if (ModelState.IsValid)
@@ -125,32 +123,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 if (mainImageBottomRightFile != null)
                     project.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
 
-                // Handle gallery images
-                var gallery = new List<ImageModel>();
-                int sortOrder = 0;
-
-                if (images != null && images.Any())
-                {
-                    foreach (var file in images)
-                    {
-                        var url = await _imageService.SaveAndCompressImage(file);
-                        if (url == null) continue;
-
-                        var imageName = Path.GetFileNameWithoutExtension(file.FileName);
-                        var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
-
-                        gallery.Add(new ImageModel
-                        {
-                            ImageUrl = url,
-                            Title = title,
-                            AltText = title,
-                            SortOrder = sortOrder++
-                        });
-                    }
-                }
-
-                project.Images = gallery;
-
                 _context.Projects.Add(project);
                 await _context.SaveChangesAsync();
 
@@ -165,10 +137,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _context.Projects
-                .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
             if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", project);
@@ -182,15 +151,10 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph")] Project postedProject,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
-            IFormFile? mainImageBottomRightFile,
-            List<IFormFile>? images,
-            string[]? existingImages
+            IFormFile? mainImageBottomRightFile
         )
         {
-            var projectToUpdate = await _context.Projects
-                .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
+            var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
             if (projectToUpdate == null) return NotFound();
 
             if (ModelState.IsValid)
@@ -211,50 +175,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 if (mainImageBottomRightFile != null)
                     projectToUpdate.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
 
-                // Build unified images list
-                var unifiedImages = new List<ImageModel>();
-                int sortOrder = 0;
-
-                // Existing images that were not removed
-                if (existingImages != null)
-                {
-                    foreach (var url in existingImages)
-                    {
-                        unifiedImages.Add(new ImageModel
-                        {
-                            ImageUrl = url,
-                            Title = Path.GetFileNameWithoutExtension(url),
-                            AltText = Path.GetFileNameWithoutExtension(url),
-                            SortOrder = sortOrder++
-                        });
-                    }
-                }
-
-                // New uploads
-                if (images != null && images.Any())
-                {
-                    foreach (var file in images)
-                    {
-                        var url = await _imageService.SaveAndCompressImage(file);
-                        if (url == null) continue;
-
-                        var imageName = Path.GetFileNameWithoutExtension(file.FileName);
-                        var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
-
-                        unifiedImages.Add(new ImageModel
-                        {
-                            ImageUrl = url,
-                            Title = title,
-                            AltText = title,
-                            SortOrder = sortOrder++
-                        });
-                    }
-                }
-
-                // Replace list
-                _context.ProjectImages.RemoveRange(projectToUpdate.Images);
-                projectToUpdate.Images = unifiedImages;
-
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -267,10 +187,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _context.Projects
-                .Include(p => p.Images)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
+            var project = await _context.Projects.FirstOrDefaultAsync(m => m.Id == id);
             if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Delete.cshtml", project);
@@ -281,16 +198,8 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var project = await _context.Projects
-                .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == id);
-
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
             if (project == null) return NotFound();
-
-            if (project.Images.Any())
-            {
-                _context.ProjectImages.RemoveRange(project.Images);
-            }
 
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();

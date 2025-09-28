@@ -10,7 +10,6 @@ namespace GoatSilencerArchitecture.Data
             : base(options) { }
 
         public DbSet<Project> Projects { get; set; }
-        public DbSet<ImageModel> ProjectImages { get; set; }
         public DbSet<ImageModel> BlogImages { get; set; }
         public DbSet<BlogComponent> Blogs { get; set; }
         public DbSet<ContactInfo> ContactInfos { get; set; }

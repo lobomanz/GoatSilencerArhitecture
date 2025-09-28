@@ -17,8 +17,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var projects = await _context.Projects
-                .Include(g => g.Images)
-                .OrderByDescending(g => g.UpdatedUtc)
+                .OrderByDescending(p => p.UpdatedUtc)
                 .ToListAsync();
 
             // Show last 3 updated projects as "featured"

@@ -20,9 +20,9 @@
             {
                 var gallery = featured[i];
                 <div class="carousel-item @(i == 0 ? "active" : "")">
-                    @if (gallery.Images != null && gallery.Images.Any())
+                    @if (!string.IsNullOrEmpty(gallery.MainImageLeft))
                     {
-                        <img src="@gallery.Images.First().ImageUrl" class="d-block w-100" style="height:400px; object-fit:cover;" alt="@gallery.Title" />
+                        <img src="@gallery.MainImageLeft" class="d-block w-100" style="height:400px; object-fit:cover;" alt="@gallery.Title" />
                     }
                     else
                     {
@@ -31,7 +31,7 @@
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
                         <h5>@gallery.Title</h5>
                         <p>@gallery.Description</p>
-                        <a asp-controller="Projects" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-sm btn-light">View Gallery</a>
+                        <a asp-controller="Projects" asp-action="Details" asp-route-id="@gallery.Id" class="btn btn-sm btn-light">View Project</a>
                     </div>
                 </div>
             }
@@ -54,13 +54,13 @@
         {
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm">
-                    @if (gallery.Images != null && gallery.Images.Any())
+                    @if (!string.IsNullOrEmpty(gallery.MainImageLeft))
                     {
-                        <img src="@gallery.Images.First().ImageUrl" class="card-img-top" style="height:200px; object-fit:cover;" />
+                        <img src="@gallery.MainImageLeft" class="card-img-top" style="height:200px; object-fit:cover;" alt="@gallery.Title" />
                     }
                     else
                     {
-                        <img src="/images/placeholder.png" class="card-img-top" style="height:200px; object-fit:cover;" />
+                        <img src="/images/placeholder.png" class="card-img-top" style="height:200px; object-fit:cover;" alt="No image available" />
                     }
                     <div class="card-body">
                         <h5 class="card-title">@gallery.Title</h5>

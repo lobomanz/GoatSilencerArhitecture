@@ -3,23 +3,22 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/Admin/Projects/Shared.css" asp-append-version="true" />
 }
+
 @{
     ViewData["Title"] = "Projects";
     var currentSort = ViewData["CurrentSort"] as string;
 
     string GetSortIndicator(string sortParam)
     {
-        // Default sort = UpdatedUtc descending
         if (string.IsNullOrEmpty(currentSort) && sortParam == "UpdatedUtc")
-            return " &#9660;"; 
+            return " &#9660;"; // Default: UpdatedUtc desc
 
         if (currentSort == sortParam)
-            return " &#9650;"; 
+            return " &#9650;"; // Ascending
 
-        // Check the *_desc version
         var descParam = char.ToLower(sortParam[0]) + sortParam.Substring(1) + "_desc";
         if (currentSort == descParam)
-            return " &#9660;"; 
+            return " &#9660;"; // Descending
 
         return "";
     }
@@ -46,16 +45,18 @@
 <form asp-action="Index" method="get">
     <div class="form-actions no-color">
         <p>
-            Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            Find by name:
+            <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
             <input type="submit" value="Search" class="btn btn-default" /> |
             <a asp-action="Index">Back to Full List</a>
         </p>
     </div>
 </form>
 
-<table class="table">
+<table class="table table-striped align-middle">
     <thead>
         <tr>
+            <th>Thumbnail</th>
             <th class="@GetSortClass("SortOrder")">
                 <a asp-action="Index"
                    asp-route-sortOrder="@ViewData["SortOrderSortParm"]"
@@ -96,15 +97,25 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.MainImageLeft))
+                    {
+                        <img src="@item.MainImageLeft" alt="@item.Title" class="thumb-img" style="width:80px; height:60px; object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No image</span>
+                    }
+                </td>
                 <td>@Html.DisplayFor(modelItem => item.SortOrder)</td>
                 <td>@Html.DisplayFor(modelItem => item.Title)</td>
                 <td>@Html.DisplayFor(modelItem => item.IsPublished)</td>
                 <td>@Html.DisplayFor(modelItem => item.CreatedUtc)</td>
                 <td>@Html.DisplayFor(modelItem => item.UpdatedUtc)</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
                 </td>
             </tr>
         }
@@ -116,17 +127,19 @@
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
+<div class="d-flex justify-content-between mt-3">
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-default @prevDisabled">
+        Previous
+    </a>
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-default @nextDisabled">
+        Next
+    </a>
+</div>
