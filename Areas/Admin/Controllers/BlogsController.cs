@@ -9,19 +9,19 @@ using System.Globalization;
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class BlogComponentsController : Controller
+    public class BlogsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public BlogComponentsController(ApplicationDbContext context)
+        public BlogsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/BlogComponents
+        // GET: Admin/Blogs
         public async Task<IActionResult> Index()
         {
-            var components = await _context.BlogComponents
+            var components = await _context.Blogs
                 .Include(c => c.Images)
                 .OrderBy(c => c.SortOrder)
                 .ToListAsync();
@@ -29,13 +29,13 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View(components);
         }
 
-        // GET: Admin/BlogComponents/Details/5
+        // GET: Admin/Blogs/Details/5
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
-            var blogComponent = await _context.BlogComponents
+            var blogComponent = await _context.Blogs
                 .Include(c => c.Images)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -44,17 +44,17 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View(blogComponent);
         }
 
-        // GET: Admin/BlogComponents/Create
+        // GET: Admin/Blogs/Create
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             var blogComponent = new BlogComponent();
-            var maxSortOrder = await _context.BlogComponents.MaxAsync(c => (int?)c.SortOrder) ?? 0;
+            var maxSortOrder = await _context.Blogs.MaxAsync(c => (int?)c.SortOrder) ?? 0;
             blogComponent.SortOrder = maxSortOrder + 1;
             return View(blogComponent);
         }
 
-        // POST: Admin/BlogComponents/Create
+        // POST: Admin/Blogs/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -101,7 +101,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
                 blogComponent.Images = gallery;
 
-                var maxSortOrder = await _context.BlogComponents.MaxAsync(c => (int?)c.SortOrder) ?? 0;
+                var maxSortOrder = await _context.Blogs.MaxAsync(c => (int?)c.SortOrder) ?? 0;
                 blogComponent.SortOrder = maxSortOrder + 1;
                 blogComponent.CreatedUtc = DateTime.UtcNow;
                 blogComponent.UpdatedUtc = DateTime.UtcNow;
@@ -114,13 +114,13 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View(blogComponent);
         }
 
-        // GET: Admin/BlogComponents/Edit/5
+        // GET: Admin/Blogs/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var blogComponent = await _context.BlogComponents
+            var blogComponent = await _context.Blogs
                 .Include(c => c.Images)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -129,7 +129,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View(blogComponent);
         }
 
-        // POST: Admin/BlogComponents/Edit/5
+        // POST: Admin/Blogs/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -147,7 +147,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var existingComponent = await _context.BlogComponents
+                var existingComponent = await _context.Blogs
                     .Include(c => c.Images)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -233,12 +233,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View(blogComponent);
         }
 
-        // GET: Admin/BlogComponents/Delete/5
+        // GET: Admin/Blogs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var blogComponent = await _context.BlogComponents
+            var blogComponent = await _context.Blogs
                 .Include(c => c.Images)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -247,12 +247,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View(blogComponent);
         }
 
-        // POST: Admin/BlogComponents/Delete/5
+        // POST: Admin/Blogs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var blogComponent = await _context.BlogComponents
+            var blogComponent = await _context.Blogs
                 .Include(c => c.Images)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -267,14 +267,14 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 if (blogComponent.Images.Any())
                     _context.BlogImages.RemoveRange(blogComponent.Images);
 
-                _context.BlogComponents.Remove(blogComponent);
+                _context.Blogs.Remove(blogComponent);
                 await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Admin/BlogComponents/Reorder
+        // POST: Admin/Blogs/Reorder
         [HttpPost]
         public async Task<IActionResult> Reorder([FromBody] int[] ids)
         {
@@ -282,7 +282,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             for (int i = 0; i < ids.Length; i++)
             {
-                var component = await _context.BlogComponents.FindAsync(ids[i]);
+                var component = await _context.Blogs.FindAsync(ids[i]);
                 if (component != null)
                 {
                     component.SortOrder = i + 1;

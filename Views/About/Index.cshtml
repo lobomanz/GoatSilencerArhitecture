@@ -8,7 +8,7 @@
 <h1>About Us</h1>
 
 @{
-    var components = await Context.BlogComponents.OrderBy(c => c.SortOrder).ToListAsync();
+    var components = await Context.Blogs.OrderBy(c => c.SortOrder).ToListAsync();
 }
 
 @if (components.Any())
