@@ -14,8 +14,6 @@ body.homepage-active header {
 body.homepage-active header .navbar { /* Target the navbar directly */
   background-color: transparent !important; /* Override bg-light */
   box-shadow: none !important; /* Override shadow-sm */
-  padding-top: 1rem; /* Adjust padding if needed */
-  padding-bottom: 1rem; /* Adjust padding if needed */
   margin-bottom: 0; /* Ensure no default margin/padding from Bootstrap is pushing it down */
 }
 body.homepage-active header .navbar-brand,
