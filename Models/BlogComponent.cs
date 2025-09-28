@@ -11,7 +11,7 @@ namespace GoatSilencerArchitecture.Models
         public string LayoutType { get; set; } = ""; // e.g., "layout-type-1", "layout-type-10"
 
         [Column(TypeName = "TEXT")] // For rich text content
-        public string TextContent { get; set; } = "";
+        public string? TextContent { get; set; } = "";
 
         public string? Image1Path { get; set; }
         public string? Image1AltText { get; set; }

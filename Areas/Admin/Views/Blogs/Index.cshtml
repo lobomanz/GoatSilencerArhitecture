@@ -35,7 +35,10 @@
                     @Html.DisplayFor(modelItem => item.LayoutType)
                 </td>
                 <td>
-                    @(item.TextContent.Length > 100 ? item.TextContent.Substring(0, 100) + "..." : item.TextContent)
+                    @if(item.TextContent != null)
+                    {
+                        @(item.TextContent.Length > 100 ? item.TextContent.Substring(0, 100) + "..." : item.TextContent)
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.SortOrder)

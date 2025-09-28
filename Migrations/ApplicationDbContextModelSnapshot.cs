@@ -46,7 +46,6 @@ namespace GoatSilencerArchitecture.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TextContent")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdatedUtc")

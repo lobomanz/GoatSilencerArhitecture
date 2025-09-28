@@ -94,6 +94,8 @@
             const image1Group = document.getElementById('image1Group');
             const image2Group = document.getElementById('image2Group');
             const textContentGroup = document.getElementById('textContentGroup');
+            const galleryGroup = document.getElementById('galleryGroup');
+
 
             function toggleFields() {
                 const type = layoutTypeSelect.value;
@@ -115,6 +117,9 @@
                         break;
                     case 'layout-type-8': // gallery
                         galleryGroup.style.display = 'block';
+                        image1Group.style.display = 'none';
+                        image2Group.style.display = 'none';
+                        textContentGroup.style.display = 'none';
                         break;
                     default: // needs text + image1 only
                         image2Group.style.display = 'none';
