@@ -16,7 +16,7 @@
             <!-- Layout Type -->
             <div class="form-group">
                 <label asp-for="LayoutType" class="control-label"></label>
-                <select asp-for="LayoutType" class="form-control" id="LayoutType">
+                <select asp-for="LayoutType" class="form-control" id="LayoutType" disabled>
                     <option value="layout-type-1">Layout Type 1 (Text Left, Image Right)</option>
                     <option value="layout-type-2">Layout Type 2 (Image Left, Text Right)</option>
                     <option value="layout-type-3">Layout Type 3 (Image Left, Text Middle, Image Right)</option>
@@ -67,7 +67,7 @@
             </div>
 
             <!-- Gallery -->
-            <div class="form-group">
+            <div class="form-group" id="galleryGroup">
                 <label class="control-label">Gallery Images</label>
                 <input type="file" name="images" multiple class="form-control" id="images" />
                 <div id="images-list" class="row mt-2">
@@ -120,6 +120,8 @@
             const image1Group = document.getElementById('image1Group');
             const image2Group = document.getElementById('image2Group');
             const textContentGroup = document.getElementById('textContentGroup');
+            const galleryGroup = document.getElementById('galleryGroup');
+
 
             function toggleFields() {
                 const type = layoutTypeSelect.value;
@@ -129,9 +131,6 @@
                 galleryGroup.style.display = 'none';
 
                 switch (type) {
-                        case 'layout-type-8': // gallery
-                        galleryGroup.style.display = 'block';
-                        break;
                     case 'layout-type-6': // 100% Text
                         image1Group.style.display = 'none';
                         image2Group.style.display = 'none';
@@ -141,6 +140,12 @@
                         image2Group.style.display = 'none';
                         break;
                     case 'layout-type-3': // needs both images
+                        break;
+                    case 'layout-type-8': // gallery
+                        galleryGroup.style.display = 'block';
+                        image1Group.style.display = 'none';
+                        image2Group.style.display = 'none';
+                        textContentGroup.style.display = 'none';
                         break;
                     default: // needs text + image1 only
                         image2Group.style.display = 'none';
