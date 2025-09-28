@@ -11,7 +11,7 @@ namespace GoatSilencerArchitecture.Data
 
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectImage> ProjectImages { get; set; }
-        public DbSet<AboutComponent> AboutComponents { get; set; }
+        public DbSet<BlogComponent> BlogComponents { get; set; }
         public DbSet<ContactInfo> ContactInfos { get; set; }
     }
 }

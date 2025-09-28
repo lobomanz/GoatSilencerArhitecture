@@ -8,25 +8,25 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class AboutComponentsController : Controller
+    public class BlogComponentsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public AboutComponentsController(ApplicationDbContext context)
+        public BlogComponentsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/AboutComponents
+        // GET: Admin/BlogComponents
         public async Task<IActionResult> Index()
         {
-            var components = await _context.AboutComponents.OrderBy(c => c.SortOrder).ToListAsync();
+            var components = await _context.BlogComponents.OrderBy(c => c.SortOrder).ToListAsync();
             return View(components);
         }
 
         // TODO: Implement Create, Edit, Delete, Reorder actions
 
-        // GET: Admin/AboutComponents/Create
+        // GET: Admin/BlogComponents/Create
         [HttpGet]
         public IActionResult Create()
         {
@@ -34,36 +34,36 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         }
 
         public async Task<IActionResult> Create(
-            [Bind("LayoutType,TextContent,Image1AltText,Image2AltText")] AboutComponent aboutComponent,
+            [Bind("LayoutType,TextContent,Image1AltText,Image2AltText")] BlogComponent blogComponent,
             IFormFile? image1File,
             IFormFile? image2File)
         {
-            ValidateRichTextContent(aboutComponent.TextContent, ModelState); // Call validation
+            ValidateRichTextContent(blogComponent.TextContent, ModelState); // Call validation
 
             if (ModelState.IsValid)
             {
                 // Handle image uploads
                 if (image1File != null)
                 {
-                    aboutComponent.Image1Path = await UploadImage(image1File);
+                    blogComponent.Image1Path = await UploadImage(image1File);
                 }
                 if (image2File != null)
                 {
-                    aboutComponent.Image2Path = await UploadImage(image2File);
+                    blogComponent.Image2Path = await UploadImage(image2File);
                 }
 
                 // Set SortOrder
-                var maxSortOrder = await _context.AboutComponents.MaxAsync(c => (int?)c.SortOrder) ?? 0;
-                aboutComponent.SortOrder = maxSortOrder + 1;
+                var maxSortOrder = await _context.BlogComponents.MaxAsync(c => (int?)c.SortOrder) ?? 0;
+                blogComponent.SortOrder = maxSortOrder + 1;
 
-                aboutComponent.CreatedUtc = DateTime.UtcNow;
-                aboutComponent.UpdatedUtc = DateTime.UtcNow;
+                blogComponent.CreatedUtc = DateTime.UtcNow;
+                blogComponent.UpdatedUtc = DateTime.UtcNow;
 
-                _context.Add(aboutComponent);
+                _context.Add(blogComponent);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(aboutComponent);
+            return View(blogComponent);
         }
 
         private async Task<string> UploadImage(IFormFile file)
@@ -89,7 +89,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         }
 
 
-        // GET: Admin/AboutComponents/Edit/5
+        // GET: Admin/BlogComponents/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -98,71 +98,71 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aboutComponent = await _context.AboutComponents.FindAsync(id);
-            if (aboutComponent == null)
+            var blogComponent = await _context.BlogComponents.FindAsync(id);
+            if (blogComponent == null)
             {
                 return NotFound();
             }
-            return View(aboutComponent);
+            return View(blogComponent);
         }
 
-        // POST: Admin/AboutComponents/Edit/5
+        // POST: Admin/BlogComponents/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, 
-            [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc,Image1AltText,Image2AltText")] AboutComponent aboutComponent,
+            [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc,Image1AltText,Image2AltText")] BlogComponent blogComponent,
             IFormFile? image1File,
             IFormFile? image2File)
         {
-            if (id != aboutComponent.Id)
+            if (id != blogComponent.Id)
             {
                 return NotFound();
             }
 
-            ValidateRichTextContent(aboutComponent.TextContent, ModelState); // Call validation
+            ValidateRichTextContent(blogComponent.TextContent, ModelState); // Call validation
 
             // Custom validation based on LayoutType
-            switch (aboutComponent.LayoutType)
+            switch (blogComponent.LayoutType)
             {
                 case "layout-type-1": // Text Left, Image Right
                 case "layout-type-2": // Image Left, Text Right
                 case "layout-type-4": // Image Top Right, Text Spill Left
                 case "layout-type-5": // Image Top Left, Text Spill Right
-                    if (string.IsNullOrEmpty(aboutComponent.TextContent))
+                    if (string.IsNullOrEmpty(blogComponent.TextContent))
                         ModelState.AddModelError("TextContent", "Text Content is required for this layout type.");
-                    if (image1File == null && string.IsNullOrEmpty(aboutComponent.Image1Path))
+                    if (image1File == null && string.IsNullOrEmpty(blogComponent.Image1Path))
                         ModelState.AddModelError("Image1Path", "Image 1 is required for this layout type.");
-                    if (string.IsNullOrEmpty(aboutComponent.Image1AltText))
+                    if (string.IsNullOrEmpty(blogComponent.Image1AltText))
                         ModelState.AddModelError("Image1AltText", "Image 1 Alt Text is required for this layout type.");
                     break;
                 case "layout-type-3": // Image Left, Text Middle, Image Right
-                    if (string.IsNullOrEmpty(aboutComponent.TextContent))
+                    if (string.IsNullOrEmpty(blogComponent.TextContent))
                         ModelState.AddModelError("TextContent", "Text Content is required for this layout type.");
-                    if (image1File == null && string.IsNullOrEmpty(aboutComponent.Image1Path))
+                    if (image1File == null && string.IsNullOrEmpty(blogComponent.Image1Path))
                         ModelState.AddModelError("Image1Path", "Image 1 is required for this layout type.");
-                    if (string.IsNullOrEmpty(aboutComponent.Image1AltText))
+                    if (string.IsNullOrEmpty(blogComponent.Image1AltText))
                         ModelState.AddModelError("Image1AltText", "Image 1 Alt Text is required for this layout type.");
-                    if (image2File == null && string.IsNullOrEmpty(aboutComponent.Image2Path))
+                    if (image2File == null && string.IsNullOrEmpty(blogComponent.Image2Path))
                         ModelState.AddModelError("Image2Path", "Image 2 is required for this layout type.");
-                    if (string.IsNullOrEmpty(aboutComponent.Image2AltText))
+                    if (string.IsNullOrEmpty(blogComponent.Image2AltText))
                         ModelState.AddModelError("Image2AltText", "Image 2 Alt Text is required for this layout type.");
                     break;
                 case "layout-type-6": // 100% Text
-                    if (string.IsNullOrEmpty(aboutComponent.TextContent))
+                    if (string.IsNullOrEmpty(blogComponent.TextContent))
                         ModelState.AddModelError("TextContent", "Text Content is required for this layout type.");
                     break;
                 case "layout-type-7": // 100% Picture
-                    if (image1File == null && string.IsNullOrEmpty(aboutComponent.Image1Path))
+                    if (image1File == null && string.IsNullOrEmpty(blogComponent.Image1Path))
                         ModelState.AddModelError("Image1Path", "Image 1 is required for this layout type.");
-                    if (string.IsNullOrEmpty(aboutComponent.Image1AltText))
+                    if (string.IsNullOrEmpty(blogComponent.Image1AltText))
                         ModelState.AddModelError("Image1AltText", "Image 1 Alt Text is required for this layout type.");
                     break;
             }
 
             // AltText uniqueness validation (already implemented)
-            if (!string.IsNullOrEmpty(aboutComponent.Image1AltText) &&
-                !string.IsNullOrEmpty(aboutComponent.Image2AltText) &&
-                aboutComponent.Image1AltText == aboutComponent.Image2AltText) // Check if both are provided and same
+            if (!string.IsNullOrEmpty(blogComponent.Image1AltText) &&
+                !string.IsNullOrEmpty(blogComponent.Image2AltText) &&
+                blogComponent.Image1AltText == blogComponent.Image2AltText) // Check if both are provided and same
             {
                 ModelState.AddModelError("Image1AltText", "Image Alt Texts cannot be the same.");
                 ModelState.AddModelError("Image2AltText", "Image Alt Texts cannot be the same.");
@@ -173,7 +173,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 try
                 {
                     // Preserve existing image paths and alt texts if no new file is uploaded
-                    var existingComponent = await _context.AboutComponents.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+                    var existingComponent = await _context.BlogComponents.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
                     if (existingComponent == null)
                     {
                         return NotFound();
@@ -187,12 +187,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                         {
                             DeleteImageFile(existingComponent.Image1Path);
                         }
-                        aboutComponent.Image1Path = await UploadImage(image1File);
+                        blogComponent.Image1Path = await UploadImage(image1File);
                     }
                     else
                     {
-                        aboutComponent.Image1Path = existingComponent.Image1Path; // Keep existing image
-                        aboutComponent.Image1AltText = existingComponent.Image1AltText; // Keep existing alt text
+                        blogComponent.Image1Path = existingComponent.Image1Path; // Keep existing image
+                        blogComponent.Image1AltText = existingComponent.Image1AltText; // Keep existing alt text
                     }
 
                     // Handle Image 2
@@ -203,21 +203,21 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                         {
                             DeleteImageFile(existingComponent.Image2Path);
                         }
-                        aboutComponent.Image2Path = await UploadImage(image2File);
+                        blogComponent.Image2Path = await UploadImage(image2File);
                     }
                     else
                     {
-                        aboutComponent.Image2Path = existingComponent.Image2Path; // Keep existing image
-                        aboutComponent.Image2AltText = existingComponent.Image2AltText; // Keep existing alt text
+                        blogComponent.Image2Path = existingComponent.Image2Path; // Keep existing image
+                        blogComponent.Image2AltText = existingComponent.Image2AltText; // Keep existing alt text
                     }
 
-                    aboutComponent.UpdatedUtc = DateTime.UtcNow;
-                    _context.Update(aboutComponent);
+                    blogComponent.UpdatedUtc = DateTime.UtcNow;
+                    _context.Update(blogComponent);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AboutComponentExists(aboutComponent.Id))
+                    if (!BlogComponentExists(blogComponent.Id))
                     {
                         return NotFound();
                     }
@@ -228,12 +228,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(aboutComponent);
+            return View(blogComponent);
         }
 
-        private bool AboutComponentExists(int id)
+        private bool BlogComponentExists(int id)
         {
-            return _context.AboutComponents.Any(e => e.Id == id);
+            return _context.BlogComponents.Any(e => e.Id == id);
         }
 
         private void ValidateRichTextContent(string htmlContent, ModelStateDictionary modelState)
@@ -311,7 +311,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             }
         }
 
-        // GET: Admin/AboutComponents/Delete/5
+        // GET: Admin/BlogComponents/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -319,42 +319,42 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aboutComponent = await _context.AboutComponents
+            var blogComponent = await _context.BlogComponents
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (aboutComponent == null)
+            if (blogComponent == null)
             {
                 return NotFound();
             }
 
-            return View(aboutComponent);
+            return View(blogComponent);
         }
 
-        // POST: Admin/AboutComponents/Delete/5
+        // POST: Admin/BlogComponents/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var aboutComponent = await _context.AboutComponents.FindAsync(id);
-            if (aboutComponent != null)
+            var blogComponent = await _context.BlogComponents.FindAsync(id);
+            if (blogComponent != null)
             {
                 // Delete associated images
-                if (!string.IsNullOrEmpty(aboutComponent.Image1Path))
+                if (!string.IsNullOrEmpty(blogComponent.Image1Path))
                 {
-                    DeleteImageFile(aboutComponent.Image1Path);
+                    DeleteImageFile(blogComponent.Image1Path);
                 }
-                if (!string.IsNullOrEmpty(aboutComponent.Image2Path))
+                if (!string.IsNullOrEmpty(blogComponent.Image2Path))
                 {
-                    DeleteImageFile(aboutComponent.Image2Path);
+                    DeleteImageFile(blogComponent.Image2Path);
                 }
 
-                _context.AboutComponents.Remove(aboutComponent);
+                _context.BlogComponents.Remove(blogComponent);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Admin/AboutComponents/Reorder
+        // POST: Admin/BlogComponents/Reorder
         [HttpPost]
         public async Task<IActionResult> Reorder([FromBody] int[] ids)
         {
@@ -365,7 +365,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             for (int i = 0; i < ids.Length; i++)
             {
-                var component = await _context.AboutComponents.FindAsync(ids[i]);
+                var component = await _context.BlogComponents.FindAsync(ids[i]);
                 if (component != null)
                 {
                     component.SortOrder = i + 1; // Set new sort order

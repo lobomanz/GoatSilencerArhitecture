@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GoatSilencerArchitecture.Models
 {
-    public class AboutComponent
+    public class BlogComponent
     {
         public int Id { get; set; }
 
