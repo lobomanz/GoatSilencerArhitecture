@@ -2,6 +2,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 30px;
+  margin-top: 80px;
 }
 
 .projects-left {
@@ -14,29 +15,26 @@
   margin-left: 15px;
 }
 
-.project-block {
-  margin-bottom: 40px;
-  margin-top: 20px;
-}
 .project-block img {
   width: 100%;
   height: auto;
   cursor: pointer;
   transition: filter 0.3s ease;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 .project-block img:hover {
   filter: brightness(60%);
 }
 
 .project-heading {
-  margin-top: 10px;
-  font-size: 30px;
+  font-size: 2rem;
+  margin: 0px;
 }
 
 .project-paragraph {
-  margin-top: 5px;
-  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 150px;
+  font-size: 1.2rem;
   color: #b4b4b4;
 }
 
