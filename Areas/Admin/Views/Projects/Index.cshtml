@@ -1,5 +1,8 @@
 @model GoatSilencerArchitecture.Utilities.PaginatedList<GoatSilencerArchitecture.Models.Project>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/Projects/Shared.css" asp-append-version="true" />
+}
 @{
     ViewData["Title"] = "Projects";
     var currentSort = ViewData["CurrentSort"] as string;

@@ -10,7 +10,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
+    <header style="opacity:1;top:0;">
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="Admin" asp-controller="Home" asp-action="Index">Admin Dashboard</a>
@@ -37,7 +37,7 @@
             </div>
         </nav>
     </header>
-    <div class="container mt-4">
+    <div class="container" style="margin-top:100px;">
         @RenderBody()
     </div>
     <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
