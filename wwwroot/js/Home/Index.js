@@ -23,17 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
         dotsContainer.innerHTML = ''; // Clear existing dots if any
         // Only create dots for original slides, not the clone
         for (let i = 0; i < slides.length - 1; i++) {
+            const dotContainer = document.createElement('div');
+            dotContainer.classList.add('dot-container');
+            dotContainer.dataset.index = i; // Add data-index to container
+            
             const dot = document.createElement('div');
             dot.classList.add('dot');
             if (i === 0) {
                 dot.classList.add('active');
             }
-            dot.dataset.index = i;
-            dotsContainer.appendChild(dot);
+            dotContainer.appendChild(dot);
+            dotsContainer.appendChild(dotContainer);
         }
     }
 
-    const dots = document.querySelectorAll('.dot');
+    const dotContainers = document.querySelectorAll('.dot-container'); // Select containers
+    const dots = document.querySelectorAll('.dot-container .dot'); // Select actual dots inside containers
 
     function goToSlide(index, animate = true) {
         if (isScrolling && animate) return; // Prevent rapid navigation during transition
@@ -78,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update dots for original slides
-        dots.forEach((dot, idx) => {
+        dotContainers.forEach((container, idx) => {
+            const dot = container.querySelector('.dot'); // Get the inner dot
             dot.classList.remove('active', 'neighbour-dot'); // Clear all active and neighbour classes
             const originalSlideIndex = currentSlide % (slides.length - 1);
 
@@ -132,8 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dot navigation
     if (dotsContainer) {
         dotsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('dot')) {
-                const index = parseInt(e.target.dataset.index);
+            // Target the dot-container, not the dot itself
+            const targetContainer = e.target.closest('.dot-container');
+            if (targetContainer) {
+                const index = parseInt(targetContainer.dataset.index);
                 goToSlide(index);
             }
         });

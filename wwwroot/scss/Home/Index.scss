@@ -81,28 +81,39 @@ body.homepage-active {
     display: flex;
     flex-direction: column;
     align-items: center; /* Added to center dots horizontally within the flex container */
+    /* gap: 8px; // Gap will be handled by dot-container margin */
 
-    .dot {
-        width: 6px; /* Regular width */
-        height: 6px; /* Regular height */
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.5);
-        margin: 8px 0;
-        cursor: pointer;
-        transition: all 0.3s ease; /* Transition all properties */
+    .dot-container {
+        width: 20px; /* Fixed width for the container */
+        height: 20px; /* Fixed height for the container */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 4px 0; /* Spacing between dot containers */
+        cursor: pointer; /* Cursor on container */
 
-        &.active {
-            width: 10px; /* Active width */
-            height: 10px; /* Active height */
-            background-color: #ffffff;
+        .dot {
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease; /* Transition all properties */
+            flex-shrink: 0; /* Prevent dots from shrinking */
+
+            width: 6px; /* Regular width */
+            height: 6px; /* Regular height */
+
+            &.active {
+                width: 10px; /* Active width */
+                height: 10px; /* Active height */
+                background-color: #ffffff;
+            }
+
+            &.neighbour-dot {
+                width: 8px; /* Neighbour width */
+                height: 8px; /* Neighbour height */
+            }
         }
 
-        &.neighbour-dot {
-            width: 8px; /* Neighbour width */
-            height: 8px; /* Neighbour height */
-        }
-
-        &:hover {
+        &:hover .dot { /* Hover on container affects the dot inside */
             width: 12px; /* Hovered width */
             height: 12px; /* Hovered height */
             background-color: rgba(255, 255, 255, 0.7); /* Slightly brighter on hover */
