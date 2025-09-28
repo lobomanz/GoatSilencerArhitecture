@@ -1,10 +1,10 @@
 @model IEnumerable<GoatSilencerArchitecture.Models.BlogComponent>
 
 @{
-    ViewData["Title"] = "About Components";
+    ViewData["Title"] = "Blog Components";
 }
 
-<h1>About Components</h1>
+<h1>Blog Components</h1>
 
 @Html.AntiForgeryToken()
 
@@ -74,7 +74,7 @@
                         var tokenValue = antiForgeryToken ? antiForgeryToken.value : '';
 
                         // Send new order to server
-                        fetch('/Admin/AboutComponents/Reorder', {
+                        fetch('/Admin/Blogs/Reorder', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

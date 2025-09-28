@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class BlogComponentsController : Controller
+    public class BlogsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public BlogComponentsController(ApplicationDbContext context)
+        public BlogsController(ApplicationDbContext context)
         {
             _context = context;
         }
