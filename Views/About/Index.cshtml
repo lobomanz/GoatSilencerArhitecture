@@ -8,7 +8,10 @@
 <h1>About Us</h1>
 
 @{
-    var components = await Context.Blogs.OrderBy(c => c.SortOrder).ToListAsync();
+    var components = await Context.Blogs
+        .Include(c => c.Images)  // include gallery images
+        .OrderBy(c => c.SortOrder)
+        .ToListAsync();
 }
 
 @if (components.Any())
@@ -24,7 +27,7 @@
                 <div class="image-content">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
                 </div>
             }
@@ -33,7 +36,7 @@
                 <div class="image-content">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
                 </div>
                 <div class="text-content">
@@ -45,7 +48,7 @@
                 <div class="image-content-left">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="Component Image 1" />
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
                 </div>
                 <div class="text-content">
@@ -54,7 +57,7 @@
                 <div class="image-content-right">
                     @if (!string.IsNullOrEmpty(component.Image2Path))
                     {
-                        <img src="@Url.Content(component.Image2Path)" alt="Component Image 2" />
+                        <img src="@Url.Content(component.Image2Path)" alt="@component.Image2AltText" />
                     }
                 </div>
             }
@@ -63,7 +66,7 @@
                 <div class="image-content image-float-right">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
                 </div>
                 <div class="text-content">
@@ -75,7 +78,7 @@
                 <div class="image-content image-float-left">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="Component Image" />
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
                 </div>
                 <div class="text-content">
@@ -96,6 +99,44 @@
                         <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
                 </div>
+            }
+            else if (component.LayoutType == "layout-type-8")
+            {
+                if (component.Images != null && component.Images.Any())
+                {
+                    var carouselId = $"carousel-{component.Id}";
+                    <div id="@carouselId" class="carousel slide mb-4" data-bs-ride="carousel" style="width:100%;">
+                        <div class="carousel-inner">
+                            @for (int i = 0; i < component.Images.Count; i++)
+                            {
+                                var img = component.Images.ElementAt(i);
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@img.ImageUrl" class="d-block w-100" style="max-height:500px; object-fit:cover;" alt="@img.AltText" />
+                                    @if (!string.IsNullOrEmpty(img.Title))
+                                    {
+                                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                            <p>@img.Title</p>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        <div class="carousel-indicators">
+                            @for (int i = 0; i < component.Images.Count; i++)
+                            {
+                                <button type="button" data-bs-target="#@carouselId" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-label="Slide @(i + 1)"></button>
+                            }
+                        </div>
+                    </div>
+                }
             }
         </section>
     }

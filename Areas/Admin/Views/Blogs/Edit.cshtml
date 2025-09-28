@@ -24,6 +24,7 @@
                     <option value="layout-type-5">Layout Type 5 (Image Top Left, Text Spill Right)</option>
                     <option value="layout-type-6">Layout Type 6 (100% Text)</option>
                     <option value="layout-type-7">Layout Type 7 (100% Picture)</option>
+                    <option value="layout-type-8">Layout Type 8 (Gallery)</option>
                 </select>
                 <span asp-validation-for="LayoutType" class="text-danger"></span>
             </div>
@@ -125,8 +126,12 @@
                 image1Group.style.display = 'block';
                 image2Group.style.display = 'block';
                 textContentGroup.style.display = 'block';
+                galleryGroup.style.display = 'none';
 
                 switch (type) {
+                        case 'layout-type-8': // gallery
+                        galleryGroup.style.display = 'block';
+                        break;
                     case 'layout-type-6': // 100% Text
                         image1Group.style.display = 'none';
                         image2Group.style.display = 'none';
