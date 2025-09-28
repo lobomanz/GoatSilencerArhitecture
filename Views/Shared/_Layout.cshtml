@@ -12,10 +12,12 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
         header {
-            position: relative; /* Ensure 'top' property works */
+            position: fixed; /* Changed from relative to fixed */
             top: -100px; /* Start above the viewport (adjust as needed) */
+            width: 100%; /* Ensure it spans the full width */
+            z-index: 1030; /* Ensure it stays on top of other content */
             opacity: 0;
-            transition: top 0.3s ease-out, opacity 0.3s ease-out;
+            transition: top 0.5s ease-out, opacity 0.5s ease-out;
         }
 
             header.show {
@@ -25,14 +27,13 @@
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="@(isAboutPage ? "bg-dark text-white" : "")">
+<body class="@(isAboutPage ? "bg-dark text-white" : "")" style="padding-top: 60px;">
     <header>
         <nav class="navbar navbar-expand-lg @(isAboutPage ? "navbar-dark bg-dark" : "navbar-light bg-white")">
             <div class="container-fluid">
                 <!-- Logo (left) -->
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/logo.png" alt="Logo" style="height:40px;" class="me-2" />
-                    GoatSilencer Architecture
+                    studiom2n
                 </a>
 
                 <!-- Toggle for mobile -->
