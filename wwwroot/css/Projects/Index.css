@@ -1,3 +1,43 @@
+.projects-container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 30px;
+}
 
+.projects-left {
+  width: calc(70% - 20px);
+  margin-right: 20px;
+}
+
+.projects-right {
+  width: calc(30% - 15px);
+  margin-left: 15px;
+}
+
+.project-block {
+  margin-bottom: 40px;
+  margin-top: 20px;
+}
+.project-block img {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  transition: filter 0.3s ease;
+  margin-bottom: 20px;
+}
+.project-block img:hover {
+  filter: brightness(80%);
+}
+
+.project-heading {
+  margin-top: 10px;
+  font-size: 30px;
+}
+
+.project-paragraph {
+  margin-top: 5px;
+  font-size: 20px;
+  color: #b4b4b4;
+}
 
 /*# sourceMappingURL=Index.css.map */

@@ -1,47 +1,79 @@
 ﻿@model IEnumerable<GoatSilencerArchitecture.Models.Project>
+
 @{
-    Layout = "_Layout";
     ViewData["Title"] = "Projects";
 }
 
-<h1 class="mb-4">Our Projects</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/Projects/Index.css" asp-append-version="true" />
+}
 
-@if (Model != null && Model.Any())
-{
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+
+<div class="projects-container">
+    <!-- LEFT GLOBAL COLUMN -->
+    <div class="projects-left">
         @foreach (var project in Model)
         {
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id" class="text-decoration-none">
-
-                        <!-- Main image with fallback -->
-                        @{
-                            var mainImageToDisplay = project.MainImageLeft ?? project.MainImageTopRight ?? project.MainImageBottomRight;
-                        }
-                        @if (!string.IsNullOrEmpty(mainImageToDisplay))
-                        {
-                            <img src="@mainImageToDisplay" class="card-img-top" style="object-fit: cover; height: 200px;" alt="@project.Title" />
-                        }
-                        else if (project.Images != null && project.Images.Any())
-                        {
-                            <img src="@project.Images.First().ImageUrl" class="card-img-top" style="object-fit: cover; height: 200px;" alt="@project.Title" />
-                        }
-                        else
-                        {
-                            <img src="/images/placeholder.jpg" class="card-img-top" style="object-fit: cover; height: 200px;" alt="No image" />
-                        }
-
-                        <div class="card-body text-center">
-                            <h5 class="card-title text-dark">@project.Title</h5>
-                        </div>
+            <div class="project-block">
+                @if (!string.IsNullOrEmpty(project.MainImageLeft))
+                {
+                    <a asp-action="Details" asp-route-id="@project.Id">
+                        <img src="@project.MainImageLeft" alt="@project.ImageLeftHeading" />
                     </a>
-                </div>
+                }
+
+                @if (!string.IsNullOrEmpty(project.ImageLeftHeading))
+                {
+                    <div class="project-heading">@project.ImageLeftHeading</div>
+                }
+
+                @if (!string.IsNullOrEmpty(project.ImageLeftParagraph))
+                {
+                    <div class="project-paragraph">@project.ImageLeftParagraph</div>
+                }
             </div>
         }
     </div>
-}
-else
-{
-    <p>No projects available at the moment. Please check back later.</p>
-}
+
+    <!-- RIGHT GLOBAL COLUMN -->
+    <div class="projects-right">
+        @foreach (var project in Model)
+        {
+            <div class="project-block">
+                @if (!string.IsNullOrEmpty(project.MainImageTopRight))
+                {
+                    <a asp-action="Details" asp-route-id="@project.Id">
+                        <img src="@project.MainImageTopRight" alt="@project.ImageRightTopHeading" />
+                    </a>
+                }
+
+                @if (!string.IsNullOrEmpty(project.ImageRightTopHeading))
+                {
+                    <div class="project-heading">@project.ImageRightTopHeading</div>
+                }
+
+                @if (!string.IsNullOrEmpty(project.ImageRightTopParagraph))
+                {
+                    <div class="project-paragraph">@project.ImageRightTopParagraph</div>
+                }
+
+                @if (!string.IsNullOrEmpty(project.MainImageBottomRight))
+                {
+                    <a asp-action="Details" asp-route-id="@project.Id">
+                        <img src="@project.MainImageBottomRight" alt="@project.ImageRightBottomHeading" />
+                    </a>
+                }
+
+                @if (!string.IsNullOrEmpty(project.ImageRightBottomHeading))
+                {
+                    <div class="project-heading">@project.ImageRightBottomHeading</div>
+                }
+
+                @if (!string.IsNullOrEmpty(project.ImageRightBottomParagraph))
+                {
+                    <div class="project-paragraph">@project.ImageRightBottomParagraph</div>
+                }
+            </div>
+        }
+    </div>
+</div>

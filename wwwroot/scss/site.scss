@@ -17,10 +17,6 @@ html {
   min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
-}
-
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
@@ -30,13 +26,6 @@ body {
   text-align: start;
 }
 
-.custom-header-width-margin {
-    @media (min-width: 992px) { // Bootstrap's 'lg' breakpoint for desktop
-        width: calc(100% - 80px);
-        margin-left: 40px;
-        margin-right: 40px;
-    }
-}
 
 .navbar-nav {
     flex-wrap: nowrap; // Prevent wrapping of nav items
@@ -44,6 +33,34 @@ body {
         .nav-link {
             padding-left: 0.5rem; // Reduce horizontal padding
             padding-right: 0.5rem; // Reduce horizontal padding
+        }
+    }
+}
+body {
+    main{
+        padding-inline:50px;
+        margin-top:100px;
+    }
+}
+header{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:1000;
+    width:100%;
+    .navbar {
+        padding-inline: 50px;
+        padding-block:10px;
+        .bg-white {
+            background: #fff;
+        }
+
+        .container-fluid {
+            padding-inline: 0px;
+        }
+
+        .pr-0 {
+            padding-right: 0px;
         }
     }
 }
