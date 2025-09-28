@@ -126,7 +126,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                     project.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
 
                 // Handle gallery images
-                var gallery = new List<ProjectImage>();
+                var gallery = new List<ImageModel>();
                 int sortOrder = 0;
 
                 if (images != null && images.Any())
@@ -139,7 +139,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                         var imageName = Path.GetFileNameWithoutExtension(file.FileName);
                         var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
 
-                        gallery.Add(new ProjectImage
+                        gallery.Add(new ImageModel
                         {
                             ImageUrl = url,
                             Title = title,
@@ -212,7 +212,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                     projectToUpdate.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
 
                 // Build unified images list
-                var unifiedImages = new List<ProjectImage>();
+                var unifiedImages = new List<ImageModel>();
                 int sortOrder = 0;
 
                 // Existing images that were not removed
@@ -220,7 +220,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 {
                     foreach (var url in existingImages)
                     {
-                        unifiedImages.Add(new ProjectImage
+                        unifiedImages.Add(new ImageModel
                         {
                             ImageUrl = url,
                             Title = Path.GetFileNameWithoutExtension(url),
@@ -241,7 +241,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                         var imageName = Path.GetFileNameWithoutExtension(file.FileName);
                         var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
 
-                        unifiedImages.Add(new ProjectImage
+                        unifiedImages.Add(new ImageModel
                         {
                             ImageUrl = url,
                             Title = title,

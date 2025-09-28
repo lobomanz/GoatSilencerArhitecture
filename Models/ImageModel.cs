@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GoatSilencerArchitecture.Models
 {
-    public class ProjectImage
+    public class ImageModel
     {
         public int Id { get; set; }
 
