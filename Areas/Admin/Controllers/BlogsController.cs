@@ -4,15 +4,16 @@ using GoatSilencerArchitecture.Data;
 using GoatSilencerArchitecture.Models;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Globalization;
 
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class BlogsController : Controller
+    public class BlogComponentsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public BlogsController(ApplicationDbContext context)
+        public BlogComponentsController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -20,42 +21,88 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         // GET: Admin/BlogComponents
         public async Task<IActionResult> Index()
         {
-            var components = await _context.BlogComponents.OrderBy(c => c.SortOrder).ToListAsync();
+            var components = await _context.BlogComponents
+                .Include(c => c.Images)
+                .OrderBy(c => c.SortOrder)
+                .ToListAsync();
+
             return View(components);
         }
 
-        // TODO: Implement Create, Edit, Delete, Reorder actions
+        // GET: Admin/BlogComponents/Details/5
+        [HttpGet]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var blogComponent = await _context.BlogComponents
+                .Include(c => c.Images)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (blogComponent == null) return NotFound();
+
+            return View(blogComponent);
+        }
 
         // GET: Admin/BlogComponents/Create
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var blogComponent = new BlogComponent();
+            var maxSortOrder = await _context.BlogComponents.MaxAsync(c => (int?)c.SortOrder) ?? 0;
+            blogComponent.SortOrder = maxSortOrder + 1;
+            return View(blogComponent);
         }
 
+        // POST: Admin/BlogComponents/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("LayoutType,TextContent,Image1AltText,Image2AltText")] BlogComponent blogComponent,
+            [Bind("LayoutType,TextContent,Image1AltText,Image2AltText,SortOrder")] BlogComponent blogComponent,
             IFormFile? image1File,
-            IFormFile? image2File)
+            IFormFile? image2File,
+            List<IFormFile>? images
+        )
         {
-            ValidateRichTextContent(blogComponent.TextContent, ModelState); // Call validation
+            ValidateRichTextContent(blogComponent.TextContent, ModelState);
 
             if (ModelState.IsValid)
             {
-                // Handle image uploads
+                // Handle single images
                 if (image1File != null)
-                {
                     blogComponent.Image1Path = await UploadImage(image1File);
-                }
+
                 if (image2File != null)
-                {
                     blogComponent.Image2Path = await UploadImage(image2File);
+
+                // Handle gallery
+                var gallery = new List<ImageModel>();
+                int sortOrder = 0;
+
+                if (images != null && images.Any())
+                {
+                    foreach (var file in images)
+                    {
+                        var url = await UploadImage(file);
+                        if (url == null) continue;
+
+                        var imageName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
+
+                        gallery.Add(new ImageModel
+                        {
+                            ImageUrl = url,
+                            Title = title,
+                            AltText = title,
+                            SortOrder = sortOrder++
+                        });
+                    }
                 }
 
-                // Set SortOrder
+                blogComponent.Images = gallery;
+
                 var maxSortOrder = await _context.BlogComponents.MaxAsync(c => (int?)c.SortOrder) ?? 0;
                 blogComponent.SortOrder = maxSortOrder + 1;
-
                 blogComponent.CreatedUtc = DateTime.UtcNow;
                 blogComponent.UpdatedUtc = DateTime.UtcNow;
 
@@ -63,9 +110,192 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(blogComponent);
         }
 
+        // GET: Admin/BlogComponents/Edit/5
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var blogComponent = await _context.BlogComponents
+                .Include(c => c.Images)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (blogComponent == null) return NotFound();
+
+            return View(blogComponent);
+        }
+
+        // POST: Admin/BlogComponents/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc,Image1AltText,Image2AltText")] BlogComponent blogComponent,
+            IFormFile? image1File,
+            IFormFile? image2File,
+            List<IFormFile>? images,
+            string[]? existingImages
+        )
+        {
+            if (id != blogComponent.Id) return NotFound();
+
+            ValidateRichTextContent(blogComponent.TextContent, ModelState);
+
+            if (ModelState.IsValid)
+            {
+                var existingComponent = await _context.BlogComponents
+                    .Include(c => c.Images)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (existingComponent == null) return NotFound();
+
+                // Handle Image1
+                if (image1File != null)
+                {
+                    if (!string.IsNullOrEmpty(existingComponent.Image1Path))
+                        DeleteImageFile(existingComponent.Image1Path);
+
+                    blogComponent.Image1Path = await UploadImage(image1File);
+                }
+                else
+                {
+                    blogComponent.Image1Path = existingComponent.Image1Path;
+                    blogComponent.Image1AltText = existingComponent.Image1AltText;
+                }
+
+                // Handle Image2
+                if (image2File != null)
+                {
+                    if (!string.IsNullOrEmpty(existingComponent.Image2Path))
+                        DeleteImageFile(existingComponent.Image2Path);
+
+                    blogComponent.Image2Path = await UploadImage(image2File);
+                }
+                else
+                {
+                    blogComponent.Image2Path = existingComponent.Image2Path;
+                    blogComponent.Image2AltText = existingComponent.Image2AltText;
+                }
+
+                // Rebuild gallery
+                var unifiedImages = new List<ImageModel>();
+                int sortOrder = 0;
+
+                if (existingImages != null)
+                {
+                    foreach (var url in existingImages)
+                    {
+                        unifiedImages.Add(new ImageModel
+                        {
+                            ImageUrl = url,
+                            Title = Path.GetFileNameWithoutExtension(url),
+                            AltText = Path.GetFileNameWithoutExtension(url),
+                            SortOrder = sortOrder++
+                        });
+                    }
+                }
+
+                if (images != null && images.Any())
+                {
+                    foreach (var file in images)
+                    {
+                        var url = await UploadImage(file);
+                        if (url == null) continue;
+
+                        var imageName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(imageName.Replace('_', ' '));
+
+                        unifiedImages.Add(new ImageModel
+                        {
+                            ImageUrl = url,
+                            Title = title,
+                            AltText = title,
+                            SortOrder = sortOrder++
+                        });
+                    }
+                }
+
+                _context.BlogImages.RemoveRange(existingComponent.Images);
+                blogComponent.Images = unifiedImages;
+
+                blogComponent.UpdatedUtc = DateTime.UtcNow;
+                _context.Update(blogComponent);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(blogComponent);
+        }
+
+        // GET: Admin/BlogComponents/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var blogComponent = await _context.BlogComponents
+                .Include(c => c.Images)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (blogComponent == null) return NotFound();
+
+            return View(blogComponent);
+        }
+
+        // POST: Admin/BlogComponents/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var blogComponent = await _context.BlogComponents
+                .Include(c => c.Images)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (blogComponent != null)
+            {
+                if (!string.IsNullOrEmpty(blogComponent.Image1Path))
+                    DeleteImageFile(blogComponent.Image1Path);
+
+                if (!string.IsNullOrEmpty(blogComponent.Image2Path))
+                    DeleteImageFile(blogComponent.Image2Path);
+
+                if (blogComponent.Images.Any())
+                    _context.BlogImages.RemoveRange(blogComponent.Images);
+
+                _context.BlogComponents.Remove(blogComponent);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Admin/BlogComponents/Reorder
+        [HttpPost]
+        public async Task<IActionResult> Reorder([FromBody] int[] ids)
+        {
+            if (ids == null || ids.Length == 0) return BadRequest("No IDs provided.");
+
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var component = await _context.BlogComponents.FindAsync(ids[i]);
+                if (component != null)
+                {
+                    component.SortOrder = i + 1;
+                    component.UpdatedUtc = DateTime.UtcNow;
+                    _context.Update(component);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        // Helpers
         private async Task<string> UploadImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -73,167 +303,24 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
             if (!Directory.Exists(uploadsFolder))
-            {
                 Directory.CreateDirectory(uploadsFolder);
-            }
 
             var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
                 await file.CopyToAsync(fileStream);
-            }
 
             return "/uploads/" + uniqueFileName;
         }
 
-
-        // GET: Admin/BlogComponents/Edit/5
-        [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        private void DeleteImageFile(string imagePath)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (string.IsNullOrEmpty(imagePath)) return;
 
-            var blogComponent = await _context.BlogComponents.FindAsync(id);
-            if (blogComponent == null)
-            {
-                return NotFound();
-            }
-            return View(blogComponent);
-        }
-
-        // POST: Admin/BlogComponents/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, 
-            [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc,Image1AltText,Image2AltText")] BlogComponent blogComponent,
-            IFormFile? image1File,
-            IFormFile? image2File)
-        {
-            if (id != blogComponent.Id)
-            {
-                return NotFound();
-            }
-
-            ValidateRichTextContent(blogComponent.TextContent, ModelState); // Call validation
-
-            // Custom validation based on LayoutType
-            switch (blogComponent.LayoutType)
-            {
-                case "layout-type-1": // Text Left, Image Right
-                case "layout-type-2": // Image Left, Text Right
-                case "layout-type-4": // Image Top Right, Text Spill Left
-                case "layout-type-5": // Image Top Left, Text Spill Right
-                    if (string.IsNullOrEmpty(blogComponent.TextContent))
-                        ModelState.AddModelError("TextContent", "Text Content is required for this layout type.");
-                    if (image1File == null && string.IsNullOrEmpty(blogComponent.Image1Path))
-                        ModelState.AddModelError("Image1Path", "Image 1 is required for this layout type.");
-                    if (string.IsNullOrEmpty(blogComponent.Image1AltText))
-                        ModelState.AddModelError("Image1AltText", "Image 1 Alt Text is required for this layout type.");
-                    break;
-                case "layout-type-3": // Image Left, Text Middle, Image Right
-                    if (string.IsNullOrEmpty(blogComponent.TextContent))
-                        ModelState.AddModelError("TextContent", "Text Content is required for this layout type.");
-                    if (image1File == null && string.IsNullOrEmpty(blogComponent.Image1Path))
-                        ModelState.AddModelError("Image1Path", "Image 1 is required for this layout type.");
-                    if (string.IsNullOrEmpty(blogComponent.Image1AltText))
-                        ModelState.AddModelError("Image1AltText", "Image 1 Alt Text is required for this layout type.");
-                    if (image2File == null && string.IsNullOrEmpty(blogComponent.Image2Path))
-                        ModelState.AddModelError("Image2Path", "Image 2 is required for this layout type.");
-                    if (string.IsNullOrEmpty(blogComponent.Image2AltText))
-                        ModelState.AddModelError("Image2AltText", "Image 2 Alt Text is required for this layout type.");
-                    break;
-                case "layout-type-6": // 100% Text
-                    if (string.IsNullOrEmpty(blogComponent.TextContent))
-                        ModelState.AddModelError("TextContent", "Text Content is required for this layout type.");
-                    break;
-                case "layout-type-7": // 100% Picture
-                    if (image1File == null && string.IsNullOrEmpty(blogComponent.Image1Path))
-                        ModelState.AddModelError("Image1Path", "Image 1 is required for this layout type.");
-                    if (string.IsNullOrEmpty(blogComponent.Image1AltText))
-                        ModelState.AddModelError("Image1AltText", "Image 1 Alt Text is required for this layout type.");
-                    break;
-            }
-
-            // AltText uniqueness validation (already implemented)
-            if (!string.IsNullOrEmpty(blogComponent.Image1AltText) &&
-                !string.IsNullOrEmpty(blogComponent.Image2AltText) &&
-                blogComponent.Image1AltText == blogComponent.Image2AltText) // Check if both are provided and same
-            {
-                ModelState.AddModelError("Image1AltText", "Image Alt Texts cannot be the same.");
-                ModelState.AddModelError("Image2AltText", "Image Alt Texts cannot be the same.");
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // Preserve existing image paths and alt texts if no new file is uploaded
-                    var existingComponent = await _context.BlogComponents.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-                    if (existingComponent == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // Handle Image 1
-                    if (image1File != null)
-                    {
-                        // Delete old image if it exists
-                        if (!string.IsNullOrEmpty(existingComponent.Image1Path))
-                        {
-                            DeleteImageFile(existingComponent.Image1Path);
-                        }
-                        blogComponent.Image1Path = await UploadImage(image1File);
-                    }
-                    else
-                    {
-                        blogComponent.Image1Path = existingComponent.Image1Path; // Keep existing image
-                        blogComponent.Image1AltText = existingComponent.Image1AltText; // Keep existing alt text
-                    }
-
-                    // Handle Image 2
-                    if (image2File != null)
-                    {
-                        // Delete old image if it exists
-                        if (!string.IsNullOrEmpty(existingComponent.Image2Path))
-                        {
-                            DeleteImageFile(existingComponent.Image2Path);
-                        }
-                        blogComponent.Image2Path = await UploadImage(image2File);
-                    }
-                    else
-                    {
-                        blogComponent.Image2Path = existingComponent.Image2Path; // Keep existing image
-                        blogComponent.Image2AltText = existingComponent.Image2AltText; // Keep existing alt text
-                    }
-
-                    blogComponent.UpdatedUtc = DateTime.UtcNow;
-                    _context.Update(blogComponent);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BlogComponentExists(blogComponent.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(blogComponent);
-        }
-
-        private bool BlogComponentExists(int id)
-        {
-            return _context.BlogComponents.Any(e => e.Id == id);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagePath.TrimStart('/'));
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
         }
 
         private void ValidateRichTextContent(string htmlContent, ModelStateDictionary modelState)
@@ -243,7 +330,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             var doc = new HtmlDocument();
             doc.LoadHtml(htmlContent);
 
-            // --- Link Validation ---
+            // Links consistency
             var links = doc.DocumentNode.SelectNodes("//a[@href]");
             if (links != null)
             {
@@ -255,14 +342,11 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                     var text = link.InnerText.Trim();
                     var title = link.GetAttributeValue("title", "").Trim();
 
-                    // Only validate internal links (same site)
-                    // This is a simplification; a more robust check would involve base URLs
-                    if (!string.IsNullOrEmpty(href) && !href.StartsWith("http://") && !href.StartsWith("https://") && !href.StartsWith("//"))
+                    if (!string.IsNullOrEmpty(href) && !href.StartsWith("http") && !href.StartsWith("//"))
                     {
                         if (!linkGroups.ContainsKey(href))
-                        {
                             linkGroups[href] = new List<(string text, string title)>();
-                        }
+
                         linkGroups[href].Add((text, title));
                     }
                 }
@@ -272,110 +356,28 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                     var firstLink = entry.Value.First();
                     if (entry.Value.Any(l => l.text != firstLink.text || l.title != firstLink.title))
                     {
-                        modelState.AddModelError("TextContent", $"Link consistency error: Links to '{entry.Key}' must have the same text and title. Found variations.");
-                        break; // Only report one error per field
+                        modelState.AddModelError("TextContent", $"Link consistency error: Links to '{entry.Key}' must have the same text and title.");
+                        break;
                     }
                 }
             }
 
-            // --- Heading Hierarchy Validation ---
+            // Heading hierarchy
             var headings = doc.DocumentNode.SelectNodes("//h1|//h2|//h3|//h4|//h5|//h6");
             if (headings != null)
             {
-                int lastLevel = 0; // Represents the last heading level encountered (e.g., 1 for h1, 2 for h2)
-                bool hierarchyBroken = false;
-
+                int lastLevel = 0;
                 foreach (var heading in headings)
                 {
-                    int currentLevel = int.Parse(heading.Name.Substring(1)); // h1 -> 1, h2 -> 2
-
+                    int currentLevel = int.Parse(heading.Name.Substring(1));
                     if (currentLevel > lastLevel + 1)
                     {
-                        modelState.AddModelError("TextContent", $"Heading hierarchy error: Cannot jump from H{lastLevel} to H{currentLevel}. Headings must follow a sequential order (e.g., H1 -> H2 -> H3).");
-                        hierarchyBroken = true;
+                        modelState.AddModelError("TextContent", $"Heading hierarchy error: Cannot jump from H{lastLevel} to H{currentLevel}.");
                         break;
                     }
                     lastLevel = currentLevel;
                 }
             }
-        }
-
-        private void DeleteImageFile(string imagePath)
-        {
-            if (string.IsNullOrEmpty(imagePath)) return;
-
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagePath.TrimStart('/'));
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
-        }
-
-        // GET: Admin/BlogComponents/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var blogComponent = await _context.BlogComponents
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (blogComponent == null)
-            {
-                return NotFound();
-            }
-
-            return View(blogComponent);
-        }
-
-        // POST: Admin/BlogComponents/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var blogComponent = await _context.BlogComponents.FindAsync(id);
-            if (blogComponent != null)
-            {
-                // Delete associated images
-                if (!string.IsNullOrEmpty(blogComponent.Image1Path))
-                {
-                    DeleteImageFile(blogComponent.Image1Path);
-                }
-                if (!string.IsNullOrEmpty(blogComponent.Image2Path))
-                {
-                    DeleteImageFile(blogComponent.Image2Path);
-                }
-
-                _context.BlogComponents.Remove(blogComponent);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        // POST: Admin/BlogComponents/Reorder
-        [HttpPost]
-        public async Task<IActionResult> Reorder([FromBody] int[] ids)
-        {
-            if (ids == null || ids.Length == 0)
-            {
-                return BadRequest("No IDs provided.");
-            }
-
-            for (int i = 0; i < ids.Length; i++)
-            {
-                var component = await _context.BlogComponents.FindAsync(ids[i]);
-                if (component != null)
-                {
-                    component.SortOrder = i + 1; // Set new sort order
-                    component.UpdatedUtc = DateTime.UtcNow;
-                    _context.Update(component);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok();
         }
     }
 }

@@ -5,13 +5,14 @@
 }
 
 <h1>Create Blog Component</h1>
-
 <hr />
+
 <div class="row">
-    <div class="col-md-8">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="col-md-10">
+        <form asp-action="Create" method="post" enctype="multipart/form-data" id="create-form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+            <!-- Layout Type -->
             <div class="form-group">
                 <label asp-for="LayoutType" class="control-label"></label>
                 <select asp-for="LayoutType" class="form-control" id="LayoutType">
@@ -26,24 +27,36 @@
                 <span asp-validation-for="LayoutType" class="text-danger"></span>
             </div>
 
+            <!-- Text -->
             <div class="form-group" id="textContentGroup">
                 <label asp-for="TextContent" class="control-label"></label>
                 <textarea asp-for="TextContent" class="form-control rich-text-editor" rows="10"></textarea>
                 <span asp-validation-for="TextContent" class="text-danger"></span>
             </div>
 
+            <!-- Image 1 -->
             <div class="form-group" id="image1Group">
                 <label>Image 1</label>
                 <input type="file" name="image1File" class="form-control" />
                 <label>Image 1 Alt Text</label>
                 <input type="text" name="image1AltText" class="form-control" />
+                <span asp-validation-for="Image1AltText" class="text-danger"></span>
             </div>
 
+            <!-- Image 2 -->
             <div class="form-group" id="image2Group">
                 <label>Image 2 (for Layout Type 3)</label>
                 <input type="file" name="image2File" class="form-control" />
                 <label>Image 2 Alt Text</label>
                 <input type="text" name="image2AltText" class="form-control" />
+                <span asp-validation-for="Image2AltText" class="text-danger"></span>
+            </div>
+
+            <!-- Gallery -->
+            <div class="form-group">
+                <label class="control-label">Gallery Images</label>
+                <input type="file" name="images" multiple class="form-control" id="images" />
+                <div id="images-list" class="row mt-2"></div>
             </div>
 
             <div class="form-group mt-3">
@@ -58,8 +71,11 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="https://cdn.tiny.cloud/1/5f03jnyxt3mkb0yuyavvuvvobp0a9y3zrrp1oqhu89aiwgmr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         tinymce.init({
             selector: 'textarea.rich-text-editor',
@@ -71,57 +87,71 @@
             content_style: 'body { font-family: Arial, sans-serif; line-height: 1.6; font-size: 16px; }'
         });
 
+        // Layout type logic
         document.addEventListener('DOMContentLoaded', function () {
             const layoutTypeSelect = document.getElementById('LayoutType');
             const image1Group = document.getElementById('image1Group');
             const image2Group = document.getElementById('image2Group');
             const textContentGroup = document.getElementById('textContentGroup');
 
-            // Get the alt text input fields
-            const image1AltTextInput = document.querySelector('#image1Group input[name="image1AltText"]');
-            const image2AltTextInput = document.querySelector('#image2Group input[name="image2AltText"]');
-
-
-            function toggleFieldVisibility() {
-                const selectedLayout = layoutTypeSelect.value;
-
-                // Reset all to visible first
+            function toggleFields() {
+                const type = layoutTypeSelect.value;
                 image1Group.style.display = 'block';
                 image2Group.style.display = 'block';
                 textContentGroup.style.display = 'block';
 
-                // Hide based on layout type
-                switch (selectedLayout) {
+                switch (type) {
                     case 'layout-type-6': // 100% Text
                         image1Group.style.display = 'none';
                         image2Group.style.display = 'none';
                         break;
                     case 'layout-type-7': // 100% Picture
                         textContentGroup.style.display = 'none';
-                        image2Group.style.display = 'none'; // No image 2 for 100% picture
+                        image2Group.style.display = 'none';
                         break;
-                    case 'layout-type-3': // Image Left, Text Middle, Image Right (requires 2 images)
-                        // All visible, but ensure image2 is visible
+                    case 'layout-type-3': // needs both images
                         break;
-                    default: // Other types (1, 2, 4, 5) require Image 1 and Text, no Image 2
+                    default: // needs text + image1 only
                         image2Group.style.display = 'none';
                         break;
                 }
-
-                // Also hide alt text fields if their corresponding image upload is hidden
-                if (image1Group.style.display === 'none' && image1AltTextInput) {
-                    image1AltTextInput.closest('.form-group').style.display = 'none';
-                }
-                if (image2Group.style.display === 'none' && image2AltTextInput) {
-                    image2AltTextInput.closest('.form-group').style.display = 'none';
-                }
             }
 
-            // Initial call on page load
-            toggleFieldVisibility();
+            toggleFields();
+            layoutTypeSelect.addEventListener('change', toggleFields);
+        });
 
-            // Listen for changes
-            layoutTypeSelect.addEventListener('change', toggleFieldVisibility);
+        // Gallery logic
+        const fileInput = document.getElementById('images');
+        const imagesList = document.getElementById('images-list');
+
+        fileInput.addEventListener('change', function (event) {
+            for (let i = 0; i < event.target.files.length; i++) {
+                let file = event.target.files[i];
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    let wrapper = document.createElement('div');
+                    wrapper.classList.add('col-md-3', 'image-item', 'mb-2');
+
+                    let img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('thumb-img');
+                    img.style.width = "200px";
+                    img.style.height = "120px";
+                    img.style.objectFit = "cover";
+
+                    let btn = document.createElement('button');
+                    btn.type = "button";
+                    btn.classList.add('btn', 'btn-warning', 'btn-sm', 'mt-1', 'remove-btn');
+                    btn.innerText = "Remove";
+                    btn.onclick = () => wrapper.remove();
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(btn);
+                    imagesList.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            }
         });
     </script>
 }

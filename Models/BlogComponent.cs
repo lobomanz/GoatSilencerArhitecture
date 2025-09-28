@@ -22,5 +22,6 @@ namespace GoatSilencerArchitecture.Models
 
         public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
+        public List<ImageModel> Images { get; set; } = new List<ImageModel>();
     }
 }
