@@ -1,5 +1,4 @@
-
-@{ 
+@{
     var isAboutPage = ViewContext.RouteData.Values["controller"]?.ToString().Equals("About", StringComparison.OrdinalIgnoreCase) ?? false;
 }
 
@@ -11,6 +10,19 @@
     <title>@ViewData["Title"] - GoatSilencer Architecture</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        header {
+            position: relative; /* Ensure 'top' property works */
+            top: -100px; /* Start above the viewport (adjust as needed) */
+            opacity: 0;
+            transition: top 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+            header.show {
+                top: 0;
+                opacity: 1;
+            }
+    </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="@(isAboutPage ? "bg-dark text-white" : "")">
@@ -48,7 +60,7 @@
         </nav>
     </header>
 
-    <main >
+    <main>
         @RenderBody()
     </main>
 
@@ -59,6 +71,22 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('header');
+            const hasAnimated = sessionStorage.getItem('headerAnimated');
+
+            if (!hasAnimated) {
+                header.classList.add('show');
+                sessionStorage.setItem('headerAnimated', 'true');
+            } else {
+                // If already animated, ensure it's visible immediately without animation
+                header.style.transition = 'none'; // Disable transition for immediate display
+                header.style.top = '0';
+                header.style.opacity = '1';
+            }
+        });
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

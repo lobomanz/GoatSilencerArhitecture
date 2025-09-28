@@ -19,7 +19,6 @@ body.homepage-active header .navbar { /* Target the navbar directly */
 body.homepage-active header .navbar-brand,
 body.homepage-active header .nav-link {
   color: #ffffff !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 body.homepage-active header .navbar-toggler-icon {
   filter: invert(1) brightness(2);
