@@ -68,23 +68,35 @@ body.homepage-active header .navbar-toggler-icon {
 .slider-dots {
   position: fixed;
   top: 50%;
-  right: 30px;
-  transform: translateY(-50%);
+  right: 30px; /* Reverted to right: 30px */
+  transform: translateY(-50%); /* Reverted to translateY only */
   z-index: 101; /* Above slider, below header potentially */
   display: flex;
   flex-direction: column;
+  align-items: center; /* Added to center dots horizontally within the flex container */
 }
 .slider-dots .dot {
-  width: 12px;
-  height: 12px;
+  width: 6px; /* Regular width */
+  height: 6px; /* Regular height */
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.5);
   margin: 8px 0;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease; /* Transition all properties */
 }
 .slider-dots .dot.active {
+  width: 10px; /* Active width */
+  height: 10px; /* Active height */
   background-color: #ffffff;
+}
+.slider-dots .dot.neighbour-dot {
+  width: 8px; /* Neighbour width */
+  height: 8px; /* Neighbour height */
+}
+.slider-dots .dot:hover {
+  width: 12px; /* Hovered width */
+  height: 12px; /* Hovered height */
+  background-color: rgba(255, 255, 255, 0.7); /* Slightly brighter on hover */
 }
 
 /*# sourceMappingURL=Index.css.map */

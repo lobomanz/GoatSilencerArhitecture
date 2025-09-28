@@ -79,10 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update dots for original slides
         dots.forEach((dot, idx) => {
-            if (idx === (currentSlide % (slides.length - 1))) { // Use modulo for dot active state
+            dot.classList.remove('active', 'neighbour-dot'); // Clear all active and neighbour classes
+            const originalSlideIndex = currentSlide % (slides.length - 1);
+
+            if (idx === originalSlideIndex) {
                 dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
+            } else if (idx === originalSlideIndex - 1 || idx === originalSlideIndex + 1) {
+                dot.classList.add('neighbour-dot');
             }
         });
 
