@@ -12,6 +12,8 @@
         <form asp-action="Create" method="post" enctype="multipart/form-data" id="create-form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+            <input type="hidden" asp-for="SortOrder" />
+
             <!-- Layout Type -->
             <div class="form-group">
                 <label asp-for="LayoutType" class="control-label"></label>
@@ -25,6 +27,7 @@
                     <option value="layout-type-7">Layout Type 7 (100% Picture)</option>
                     <option value="layout-type-8">Layout Type 8 (Gallery)</option>
                 </select>
+                <input type="hidden" asp-for="LayoutType" />
                 <span asp-validation-for="LayoutType" class="text-danger"></span>
             </div>
 
@@ -40,7 +43,7 @@
                 <label>Image 1</label>
                 <input type="file" name="image1File" class="form-control" />
                 <label>Image 1 Alt Text</label>
-                <input type="text" name="image1AltText" class="form-control" />
+                <input asp-for="Image1AltText" class="form-control" />
                 <span asp-validation-for="Image1AltText" class="text-danger"></span>
             </div>
 
@@ -49,7 +52,7 @@
                 <label>Image 2 (for Layout Type 3)</label>
                 <input type="file" name="image2File" class="form-control" />
                 <label>Image 2 Alt Text</label>
-                <input type="text" name="image2AltText" class="form-control" />
+                <input asp-for="Image2AltText" class="form-control" />
                 <span asp-validation-for="Image2AltText" class="text-danger"></span>
             </div>
 
@@ -71,12 +74,36 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+@section Styles {
+    <style>
+        #images-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .image-item {
+            cursor: grab;
+        }
+
+        .sortable-chosen {
+            opacity: 0.6;
+        }
+
+        .sortable-ghost {
+            border: 2px dashed #007bff;
+        }
+    </style>
+}
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script src="https://cdn.tiny.cloud/1/5f03jnyxt3mkb0yuyavvuvvobp0a9y3zrrp1oqhu89aiwgmr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
     <script>
         tinymce.init({
             selector: 'textarea.rich-text-editor',
@@ -96,7 +123,6 @@
             const textContentGroup = document.getElementById('textContentGroup');
             const galleryGroup = document.getElementById('galleryGroup');
 
-
             function toggleFields() {
                 const type = layoutTypeSelect.value;
                 image1Group.style.display = 'block';
@@ -105,36 +131,48 @@
                 galleryGroup.style.display = 'none';
 
                 switch (type) {
-                    case 'layout-type-6': // 100% Text
+                    case 'layout-type-6':
                         image1Group.style.display = 'none';
                         image2Group.style.display = 'none';
                         break;
-                    case 'layout-type-7': // 100% Picture
+                    case 'layout-type-7':
                         textContentGroup.style.display = 'none';
                         image2Group.style.display = 'none';
                         break;
-                    case 'layout-type-3': // needs both images
+                    case 'layout-type-3':
                         break;
-                    case 'layout-type-8': // gallery
+                    case 'layout-type-8':
                         galleryGroup.style.display = 'block';
                         image1Group.style.display = 'none';
                         image2Group.style.display = 'none';
                         textContentGroup.style.display = 'none';
                         break;
-                    default: // needs text + image1 only
+                    default:
                         image2Group.style.display = 'none';
                         break;
                 }
             }
 
-            toggleFields();
+            setTimeout(toggleFields, 1000);
             layoutTypeSelect.addEventListener('change', toggleFields);
         });
 
-        // Gallery logic
-        const fileInput = document.getElementById('images');
-        const imagesList = document.getElementById('images-list');
+        // SortableJS for drag-and-drop reordering
+        new Sortable(document.getElementById('images-list'), {
+            animation: 150,
+            handle: ".image-item",
+            ghostClass: "sortable-ghost"
+        });
 
+        // Remove previewed images
+        document.getElementById('images-list').addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-btn')) {
+                e.target.closest('.image-item').remove();
+            }
+        });
+
+        // Add new previews
+        const fileInput = document.getElementById('images');
         fileInput.addEventListener('change', function (event) {
             for (let i = 0; i < event.target.files.length; i++) {
                 let file = event.target.files[i];
@@ -158,7 +196,7 @@
 
                     wrapper.appendChild(img);
                     wrapper.appendChild(btn);
-                    imagesList.appendChild(wrapper);
+                    document.getElementById('images-list').appendChild(wrapper);
                 };
                 reader.readAsDataURL(file);
             }
