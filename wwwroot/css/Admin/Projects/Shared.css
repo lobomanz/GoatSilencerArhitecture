@@ -6,4 +6,23 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* Sortable Table Styles */
+.sort-active {
+  background-color: #f0f0f0;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.sort-link {
+  color: black;
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.sort-link:hover {
+  background-color: #e0e0e0;
+  text-decoration: underline;
+}
+
 /*# sourceMappingURL=Shared.css.map */

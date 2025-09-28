@@ -35,7 +35,6 @@ html {
 
 body main {
   padding-inline: 50px;
-  margin-top: 100px;
 }
 
 header {
@@ -191,6 +190,20 @@ header .navbar .pr-0 {
     margin-left: 0;
     margin-bottom: 15px;
   }
+}
+/* Header Animation Styles */
+header {
+  position: fixed; /* Changed from relative to fixed */
+  top: -100px; /* Start above the viewport (adjust as needed) */
+  width: 100%; /* Ensure it spans the full width */
+  z-index: 1030; /* Ensure it stays on top of other content */
+  opacity: 0;
+  transition: top 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+header.show {
+  top: 0;
+  opacity: 1;
 }
 
 /*# sourceMappingURL=site.css.map */
