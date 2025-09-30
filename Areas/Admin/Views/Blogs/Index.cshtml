@@ -1,13 +1,81 @@
 @model GoatSilencerArchitecture.Utilities.PaginatedList<GoatSilencerArchitecture.Models.BlogComponent>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/Projects/Shared.css" asp-append-version="true" />
+}
+
 @{
     ViewData["Title"] = "Blog Components";
+    var currentSort = ViewData["CurrentSort"] as string;
+
+    string GetSortIndicator(string sortParam)
+    {
+        // Default sort = Id asc
+        if (string.IsNullOrEmpty(currentSort) && sortParam == "Id")
+            return " &#9650;";
+
+        // Map column -> controller sort keys
+        string ascParam = sortParam switch
+        {
+            "Id" => "",             // Id uses "" for asc
+            "Title" => "Title",
+            "CreatedUtc" => "Date",
+            "UpdatedUtc" => "updated_date",
+            _ => ""
+        };
+
+        string descParam = sortParam switch
+        {
+            "Id" => "id_desc",
+            "Title" => "title_desc",
+            "CreatedUtc" => "date_desc",
+            "UpdatedUtc" => "updated_date_desc",
+            _ => ""
+        };
+
+        if (currentSort == ascParam)
+            return " &#9650;"; // Ascending
+        if (currentSort == descParam)
+            return " &#9660;"; // Descending
+
+        return "";
+    }
+
+    string GetSortClass(string sortParam)
+    {
+        // Default sort = Id asc
+        if (string.IsNullOrEmpty(currentSort) && sortParam == "Id")
+            return "sort-active";
+
+        string ascParam = sortParam switch
+        {
+            "Id" => "",
+            "Title" => "Title",
+            "CreatedUtc" => "Date",
+            "UpdatedUtc" => "updated_date",
+            _ => ""
+        };
+
+        string descParam = sortParam switch
+        {
+            "Id" => "id_desc",
+            "Title" => "title_desc",
+            "CreatedUtc" => "date_desc",
+            "UpdatedUtc" => "updated_date_desc",
+            _ => ""
+        };
+
+        if (currentSort == ascParam || currentSort == descParam)
+            return "sort-active";
+
+        return "";
+    }
 }
 
 <h1>Blog Components</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 
 <form asp-action="Index" method="get">
@@ -21,20 +89,44 @@
     </div>
 </form>
 
-<table class="table">
+<table class="table table-striped align-middle">
     <thead>
         <tr>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["IdSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Id</a>
+            <th class="@GetSortClass("Id")">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["IdSortParm"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="sort-link">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().Id)
+                    @Html.Raw(GetSortIndicator("Id"))
+                </a>
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Title</a>
+            <th class="@GetSortClass("Title")">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["TitleSortParm"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="sort-link">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().Title)
+                    @Html.Raw(GetSortIndicator("Title"))
+                </a>
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["CreatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Created At</a>
+            <th class="@GetSortClass("CreatedUtc")">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CreatedUtcSortParm"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="sort-link">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().CreatedUtc)
+                    @Html.Raw(GetSortIndicator("CreatedUtc"))
+                </a>
             </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["UpdatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Updated At</a>
+            <th class="@GetSortClass("UpdatedUtc")">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["UpdatedUtcSortParm"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="sort-link">
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().UpdatedUtc)
+                    @Html.Raw(GetSortIndicator("UpdatedUtc"))
+                </a>
             </th>
             <th></th>
         </tr>
@@ -43,21 +135,13 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatedUtc)</td>
+                <td>@Html.DisplayFor(modelItem => item.UpdatedUtc)</td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedUtc)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UpdatedUtc)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
                 </td>
             </tr>
         }
@@ -69,17 +153,19 @@
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
 
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
+<div class="d-flex justify-content-between mt-3">
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex - 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-default @prevDisabled">
+        Previous
+    </a>
+    <a asp-action="Index"
+       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-pageNumber="@(Model.PageIndex + 1)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       class="btn btn-default @nextDisabled">
+        Next
+    </a>
+</div>
