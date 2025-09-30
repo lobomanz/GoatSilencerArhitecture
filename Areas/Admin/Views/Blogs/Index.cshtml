@@ -1,4 +1,4 @@
-@model IEnumerable<GoatSilencerArchitecture.Models.BlogComponent>
+@model GoatSilencerArchitecture.Utilities.PaginatedList<GoatSilencerArchitecture.Models.BlogComponent>
 
 @{
     ViewData["Title"] = "Blog Components";
@@ -6,26 +6,35 @@
 
 <h1>Blog Components</h1>
 
-@Html.AntiForgeryToken()
-
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by ID or Title:
+            <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["IdSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Id</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Title</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedUtc)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CreatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Created At</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UpdatedUtc)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["UpdatedUtcSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Updated At</a>
             </th>
             <th></th>
         </tr>
@@ -33,7 +42,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr data-id="@item.Id">
+            <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
@@ -55,58 +64,22 @@
     </tbody>
 </table>
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var el = document.querySelector('tbody');
-            var sortable = Sortable.create(el, {
-                animation: 150,
-                onEnd: function (evt) {
-                    var itemEl = evt.item; // dragged HTMLElement
-                    var newIndex = evt.newIndex;
-                    var oldIndex = evt.oldIndex;
-
-                    if (newIndex !== oldIndex) {
-                        var ids = [];
-                        // Get the new order of IDs
-                        el.querySelectorAll('tr').forEach(function (row) {
-                            var id = row.getAttribute('data-id'); // Get ID from data-id attribute
-                            ids.push(parseInt(id));
-                        });
-
-                        // Include Anti-forgery token
-                        var antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
-                        var tokenValue = antiForgeryToken ? antiForgeryToken.value : '';
-
-                        // Send new order to server
-                        fetch('/Admin/Blogs/Reorder', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'RequestVerificationToken': tokenValue
-                            },
-                            body: JSON.stringify(ids)
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json(); // Or response.text() if no JSON is returned
-                        })
-                        .then(data => {
-                            console.log('Reorder successful:', data);
-                            // Optionally, refresh the page or update SortOrder display
-                            location.reload(); // Simple refresh to update SortOrder display
-                        })
-                        .catch(error => {
-                            console.error('Error reordering:', error);
-                            alert('Failed to reorder components. Please try again.');
-                            location.reload(); // Reload on error to revert order
-                        });
-                    }
-                }
-            });
-        });
-    </script>
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

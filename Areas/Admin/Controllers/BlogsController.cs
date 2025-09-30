@@ -6,6 +6,8 @@ using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Globalization;
 
+using GoatSilencerArchitecture.Utilities;
+
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -19,14 +21,64 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         }
 
         // GET: Admin/Blogs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            var components = await _context.Blogs
-                .Include(c => c.Images)
-                .OrderBy(c => c.SortOrder)
-                .ToListAsync();
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["IdSortParm"] = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
+            ViewData["TitleSortParm"] = sortOrder == "Title" ? "title_desc" : "Title";
+            ViewData["CreatedUtcSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["UpdatedUtcSortParm"] = sortOrder == "updated_date" ? "updated_date_desc" : "updated_date";
 
-            return View(components);
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var components = from c in _context.Blogs
+                           select c;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                components = components.Where(s => s.Title.Contains(searchString)
+                                       || s.Id.ToString().Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "id_desc":
+                    components = components.OrderByDescending(s => s.Id);
+                    break;
+                case "Title":
+                    components = components.OrderBy(s => s.Title);
+                    break;
+                case "title_desc":
+                    components = components.OrderByDescending(s => s.Title);
+                    break;
+                case "Date":
+                    components = components.OrderBy(s => s.CreatedUtc);
+                    break;
+                case "date_desc":
+                    components = components.OrderByDescending(s => s.CreatedUtc);
+                    break;
+                case "updated_date":
+                    components = components.OrderBy(s => s.UpdatedUtc);
+                    break;
+                case "updated_date_desc":
+                    components = components.OrderByDescending(s => s.UpdatedUtc);
+                    break;
+                default:
+                    components = components.OrderBy(s => s.Id);
+                    break;
+            }
+
+            int pageSize = 10;
+            return View(await PaginatedList<BlogComponent>.CreateAsync(components.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Admin/Blogs/Details/5
