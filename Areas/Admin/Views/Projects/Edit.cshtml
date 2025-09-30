@@ -9,32 +9,62 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <form asp-action="Edit" enctype="multipart/form-data" id="edit-form">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Published -->
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsPublished" /> @Html.DisplayNameFor(m => m.IsPublished)
                 </label>
             </div>
+
+            <!-- Title -->
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
 
+            <!-- Description -->
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
-
+            <!-- Sort Order -->
             <div class="form-group">
                 <label asp-for="SortOrder" class="control-label"></label>
                 <input asp-for="SortOrder" class="form-control" />
                 <span asp-validation-for="SortOrder" class="text-danger"></span>
+            </div>
+
+            <!-- Hidden BlogsIdList -->
+            <input type="hidden" id="BlogsIdList" name="BlogsIdList" value="@Model.BlogsIdList" />
+
+            <!-- Blog Selector -->
+            <div class="form-group">
+                <button type="button" class="btn btn-secondary" id="openBlogPopup">Add Blogs</button>
+            </div>
+
+            <!-- Selected Blogs Table -->
+            <div id="selectedBlogsContainer" class="mt-3">
+                <h5>Selected Blogs</h5>
+                <table class="table table-bordered table-sm" id="selectedBlogsTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>CreatedUtc</th>
+                            <th>UpdatedUtc</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
 
             <!-- Main Image Left -->
@@ -42,10 +72,6 @@
                 <div class="col-md-6">
                     <label asp-for="MainImageLeft" class="control-label"></label>
                     <input type="file" name="mainImageLeftFile" class="form-control" />
-                    @if (!string.IsNullOrEmpty(Model.MainImageLeft))
-                    {
-                        <img src="@Model.MainImageLeft" class="thumb-img mt-2" />
-                    }
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
@@ -66,10 +92,6 @@
                 <div class="col-md-6">
                     <label asp-for="MainImageTopRight" class="control-label"></label>
                     <input type="file" name="mainImageTopRightFile" class="form-control" />
-                    @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
-                    {
-                        <img src="@Model.MainImageTopRight" class="thumb-img mt-2" />
-                    }
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
@@ -90,10 +112,6 @@
                 <div class="col-md-6">
                     <label asp-for="MainImageBottomRight" class="control-label"></label>
                     <input type="file" name="mainImageBottomRightFile" class="form-control" />
-                    @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
-                    {
-                        <img src="@Model.MainImageBottomRight" class="thumb-img mt-2" />
-                    }
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
@@ -109,6 +127,7 @@
                 </div>
             </div>
 
+            <!-- Save -->
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -120,6 +139,36 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+<!-- Blog selection modal -->
+<div class="modal fade" id="blogPopup" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Blogs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm table-striped" id="blogsTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>LayoutType</th>
+                            <th>CreatedUtc</th>
+                            <th>UpdatedUtc</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addBlogsBtn">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Styles {
     <link rel="stylesheet" href="~/css/Admin/Projects/Shared.css" asp-append-version="true" />
 }
@@ -128,5 +177,81 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script>
+        let blogs = [];
+        let selectedBlogIds = JSON.parse(document.getElementById("BlogsIdList").value || "[]");
 
+        if (selectedBlogIds.length > 0) renderSelectedBlogs();
+
+        document.getElementById("openBlogPopup").addEventListener("click", function () {
+            fetch('/Admin/Projects/GetAllBlogs')
+                .then(res => res.json())
+                .then(data => {
+                    blogs = data;
+                    let tbody = document.querySelector("#blogsTable tbody");
+                    tbody.innerHTML = "";
+                    blogs.forEach(blog => {
+                        let checked = selectedBlogIds.includes(blog.id) ? "checked" : "";
+                        tbody.innerHTML += `
+                            <tr data-id="${blog.id}">
+                                <td><input type="checkbox" value="${blog.id}" ${checked}></td>
+                                <td>${blog.id}</td>
+                                <td>${blog.title}</td>
+                                <td>${blog.layoutType}</td>
+                                <td>${blog.createdUtc}</td>
+                                <td>${blog.updatedUtc}</td>
+                            </tr>`;
+                    });
+
+                    // toggle checkbox when clicking row
+                    document.querySelectorAll("#blogsTable tbody tr").forEach(row => {
+                        row.addEventListener("click", function (e) {
+                            if (e.target.tagName !== "INPUT") {
+                                let cb = this.querySelector("input[type='checkbox']");
+                                cb.checked = !cb.checked;
+                            }
+                        });
+                    });
+
+                    new bootstrap.Modal(document.getElementById("blogPopup")).show();
+                });
+        });
+
+        document.getElementById("addBlogsBtn").addEventListener("click", function () {
+            selectedBlogIds = Array.from(document.querySelectorAll("#blogsTable tbody input:checked"))
+                .map(cb => parseInt(cb.value));
+            renderSelectedBlogs();
+            bootstrap.Modal.getInstance(document.getElementById("blogPopup")).hide();
+        });
+
+        function renderSelectedBlogs() {
+            let tbody = document.querySelector("#selectedBlogsTable tbody");
+            tbody.innerHTML = "";
+            selectedBlogIds.forEach(id => {
+                let blog = blogs.find(b => b.id === id) || { id: id, title: "Blog #" + id, createdUtc: "-", updatedUtc: "-" };
+                tbody.innerHTML += `
+                    <tr data-id="${id}">
+                        <td>${blog.id}</td>
+                        <td>${blog.title}</td>
+                        <td>${blog.createdUtc}</td>
+                        <td>${blog.updatedUtc}</td>
+                    </tr>`;
+            });
+
+            new Sortable(tbody, {
+                animation: 150,
+                onEnd: function () {
+                    selectedBlogIds = Array.from(tbody.children).map(tr => parseInt(tr.dataset.id));
+                    updateHiddenField();
+                }
+            });
+
+            updateHiddenField();
+        }
+
+        function updateHiddenField() {
+            document.getElementById("BlogsIdList").value = JSON.stringify(selectedBlogIds);
+        }
+    </script>
 }

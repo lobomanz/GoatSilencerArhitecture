@@ -1,67 +1,145 @@
 ﻿@model GoatSilencerArchitecture.Models.Project
+@using GoatSilencerArchitecture.Models
+
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = Model?.Title ?? "Project";
+    var components = ViewData["Blogs"] as List<BlogComponent> ?? new List<BlogComponent>();
 }
 
-<div class="container-fluid px-0">
-    <!-- Main project images -->
-    <div class="row">
-        @if (!string.IsNullOrEmpty(Model?.MainImageLeft))
-        {
-            <div class="col-md-4 mb-3 text-center">
-                <img src="@Model.MainImageLeft" class="img-fluid" style="max-height:600px; object-fit:cover;" alt="@Model.ImageLeftHeading" />
-                @if (!string.IsNullOrEmpty(Model.ImageLeftHeading))
-                {
-                    <h5 class="mt-2">@Model.ImageLeftHeading</h5>
-                }
-                @if (!string.IsNullOrEmpty(Model.ImageLeftParagraph))
-                {
-                    <p>@Model.ImageLeftParagraph</p>
-                }
-            </div>
-        }
+<h1>@Model.Title</h1>
+<p>@Model.Description</p>
 
-        <div class="col-md-8">
-            @if (!string.IsNullOrEmpty(Model?.MainImageTopRight))
+@if (components.Any())
+{
+    @foreach (var component in components)
+    {
+        <section class="container-layout @component.LayoutType">
+            @if (component.LayoutType == "layout-type-1")
             {
-                <div class="mb-3 text-center">
-                    <img src="@Model.MainImageTopRight" class="img-fluid" style="max-height:300px; object-fit:cover;" alt="@Model.ImageRightTopHeading" />
-                    @if (!string.IsNullOrEmpty(Model.ImageRightTopHeading))
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+                <div class="image-content">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <h5 class="mt-2">@Model.ImageRightTopHeading</h5>
-                    }
-                    @if (!string.IsNullOrEmpty(Model.ImageRightTopParagraph))
-                    {
-                        <p>@Model.ImageRightTopParagraph</p>
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
                 </div>
             }
-
-            @if (!string.IsNullOrEmpty(Model?.MainImageBottomRight))
+            else if (component.LayoutType == "layout-type-2")
             {
-                <div class="mb-3 text-center">
-                    <img src="@Model.MainImageBottomRight" class="img-fluid" style="max-height:300px; object-fit:cover;" alt="@Model.ImageRightBottomHeading" />
-                    @if (!string.IsNullOrEmpty(Model.ImageRightBottomHeading))
+                <div class="image-content">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <h5 class="mt-2">@Model.ImageRightBottomHeading</h5>
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
                     }
-                    @if (!string.IsNullOrEmpty(Model.ImageRightBottomParagraph))
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-3")
+            {
+                <div class="image-content-left">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <p>@Model.ImageRightBottomParagraph</p>
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
+                    }
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+                <div class="image-content-right">
+                    @if (!string.IsNullOrEmpty(component.Image2Path))
+                    {
+                        <img src="@Url.Content(component.Image2Path)" alt="@component.Image2AltText" />
                     }
                 </div>
             }
-        </div>
-    </div>
-</div>
+            else if (component.LayoutType == "layout-type-4")
+            {
+                <div class="image-content image-float-right">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
+                    }
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-5")
+            {
+                <div class="image-content image-float-left">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
+                    }
+                </div>
+                <div class="text-content">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-6")
+            {
+                <div class="text-content full-width">
+                    @Html.Raw(component.TextContent)
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-7")
+            {
+                <div class="image-content full-width">
+                    @if (!string.IsNullOrEmpty(component.Image1Path))
+                    {
+                        <img src="@Url.Content(component.Image1Path)" alt="@component.Image1AltText" />
+                    }
+                </div>
+            }
+            else if (component.LayoutType == "layout-type-8")
+            {
+                if (component.Images != null && component.Images.Any())
+                {
+                    var carouselId = $"carousel-{component.Id}";
+                    <div id="@carouselId" class="carousel slide mb-4" data-bs-ride="carousel" style="width:100%;">
+                        <div class="carousel-inner">
+                            @for (int i = 0; i < component.Images.Count; i++)
+                            {
+                                var img = component.Images.ElementAt(i);
+                                <div class="carousel-item @(i == 0 ? "active" : "")">
+                                    <img src="@img.ImageUrl" class="d-block w-100" style="max-height:500px; object-fit:cover;" alt="@img.AltText" />
+                                    @if (!string.IsNullOrEmpty(img.Title))
+                                    {
+                                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                            <p>@img.Title</p>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        <div class="carousel-indicators">
+                            @for (int i = 0; i < component.Images.Count; i++)
+                            {
+                                <button type="button" data-bs-target="#@carouselId" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-label="Slide @(i + 1)"></button>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </section>
+    }
+}
+else
+{
+    <p>No blogs have been added to this project.</p>
+}
 
-<div class="container my-5">
-    <h1 class="mb-4 text-center">@Model?.Title</h1>
-
-
-
-    <div class="mt-4 text-center">
-        <a asp-action="Index" class="btn btn-secondary">← Back to Projects</a>
-    </div>
-</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/layouts.css" asp-append-version="true" />
+}
