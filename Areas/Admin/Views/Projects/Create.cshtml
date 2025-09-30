@@ -31,11 +31,7 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="RichTextContent" class="control-label"></label>
-                <textarea asp-for="RichTextContent" class="form-control rich-text-editor"></textarea>
-                <span asp-validation-for="RichTextContent" class="text-danger"></span>
-            </div>
+
 
             <div class="form-group">
                 <label asp-for="SortOrder" class="control-label"></label>
@@ -165,75 +161,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="https://cdn.tiny.cloud/1/5f03jnyxt3mkb0yuyavvuvvobp0a9y3zrrp1oqhu89aiwgmr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <script>
-        tinymce.init({
-            selector: 'textarea.rich-text-editor',
-            height: 300,
-            menubar: false,
-            plugins: 'link image lists code table',
-            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-            block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4',
-            content_style: 'body { font-family: Arial, sans-serif; line-height: 1.6; font-size: 16px; }'
-        });
 
-        let blogs = [];
-        let selectedBlogIds = JSON.parse(document.getElementById("BlogsIdList").value || "[]");
-
-        if (selectedBlogIds.length > 0) renderSelectedBlogs();
-
-        document.getElementById("openBlogPopup").addEventListener("click", function () {
-            fetch('/Admin/Projects/GetAllBlogs')
-                .then(res => res.json())
-                .then(data => {
-                    blogs = data;
-                    let tbody = document.querySelector("#blogsTable tbody");
-                    tbody.innerHTML = "";
-                    blogs.forEach(blog => {
-                        let checked = selectedBlogIds.includes(blog.id) ? "checked" : "";
-                        tbody.innerHTML += `
-                            <tr>
-                                <td><input type="checkbox" value="${blog.id}" ${checked}></td>
-                                <td>${blog.id}</td>
-                                <td>${blog.title}</td>
-                                <td>${blog.layoutType}</td>
-                                <td>${blog.createdUtc}</td>
-                                <td>${blog.updatedUtc}</td>
-                            </tr>`;
-                    });
-                    new bootstrap.Modal(document.getElementById("blogPopup")).show();
-                });
-        });
-
-        document.getElementById("addBlogsBtn").addEventListener("click", function () {
-            selectedBlogIds = Array.from(document.querySelectorAll("#blogsTable tbody input:checked"))
-                .map(cb => parseInt(cb.value));
-            renderSelectedBlogs();
-            bootstrap.Modal.getInstance(document.getElementById("blogPopup")).hide();
-        });
-
-        function renderSelectedBlogs() {
-            let list = document.getElementById("selectedBlogsList");
-            list.innerHTML = "";
-            selectedBlogIds.forEach(id => {
-                let blog = blogs.find(b => b.id === id) || { title: "Blog #" + id };
-                list.innerHTML += `<li class="list-group-item" data-id="${id}">${blog.title} (ID: ${id})</li>`;
-            });
-
-            new Sortable(list, {
-                animation: 150,
-                onEnd: function () {
-                    selectedBlogIds = Array.from(list.children).map(li => parseInt(li.dataset.id));
-                    updateHiddenField();
-                }
-            });
-
-            updateHiddenField();
-        }
-
-        function updateHiddenField() {
-            document.getElementById("BlogsIdList").value = JSON.stringify(selectedBlogIds);
-        }
-    </script>
 }

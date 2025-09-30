@@ -103,7 +103,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project project,
+            [Bind("Title,Description,IsPublished,SortOrder,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project project,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
             IFormFile? mainImageBottomRightFile
@@ -148,7 +148,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project postedProject,
+            [Bind("Id,Title,Description,IsPublished,SortOrder,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project postedProject,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
             IFormFile? mainImageBottomRightFile
@@ -163,7 +163,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 projectToUpdate.Description = postedProject.Description;
                 projectToUpdate.IsPublished = postedProject.IsPublished;
                 projectToUpdate.SortOrder = postedProject.SortOrder;
-                projectToUpdate.RichTextContent = postedProject.RichTextContent;
+
                 projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
                 projectToUpdate.UpdatedUtc = DateTime.UtcNow;
 

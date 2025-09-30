@@ -59,16 +59,7 @@
 <div class="container my-5">
     <h1 class="mb-4 text-center">@Model?.Title</h1>
 
-    @if (!string.IsNullOrEmpty(Model?.RichTextContent))
-    {
-        <div class="project-content">
-            @Html.Raw(Model.RichTextContent)
-        </div>
-    }
-    else
-    {
-        <p>No content available for this project.</p>
-    }
+
 
     <div class="mt-4 text-center">
         <a asp-action="Index" class="btn btn-secondary">← Back to Projects</a>
