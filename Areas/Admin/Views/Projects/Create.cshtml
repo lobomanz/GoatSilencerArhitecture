@@ -12,11 +12,13 @@
     <div class="col-md-8">
         <form asp-action="Create" enctype="multipart/form-data" id="create-form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsPublished" /> @Html.DisplayNameFor(m => m.IsPublished)
                 </label>
             </div>
+
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -28,6 +30,7 @@
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="RichTextContent" class="control-label"></label>
                 <textarea asp-for="RichTextContent" class="form-control rich-text-editor"></textarea>
@@ -40,8 +43,10 @@
                 <span asp-validation-for="SortOrder" class="text-danger"></span>
             </div>
 
+            <!-- Hidden BlogsIdList -->
             <input type="hidden" id="BlogsIdList" name="BlogsIdList" value="@Model.BlogsIdList" />
 
+            <!-- Blog Selector -->
             <div class="form-group">
                 <button type="button" class="btn btn-secondary" id="openBlogPopup">Add Blogs</button>
             </div>
@@ -51,7 +56,7 @@
                 <ul id="selectedBlogsList" class="list-group"></ul>
             </div>
 
-            <!-- Main images (unchanged) -->
+            <!-- Main Image Left -->
             <div class="form-group d-flex flex-wrap">
                 <div class="col-md-6">
                     <label asp-for="MainImageLeft" class="control-label"></label>
@@ -70,7 +75,46 @@
                     </div>
                 </div>
             </div>
-            <!-- TopRight & BottomRight groups remain same -->
+
+            <!-- Main Image Top Right -->
+            <div class="form-group d-flex flex-wrap">
+                <div class="col-md-6">
+                    <label asp-for="MainImageTopRight" class="control-label"></label>
+                    <input type="file" name="mainImageTopRightFile" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ImageRightTopHeading" class="control-label"></label>
+                        <input asp-for="ImageRightTopHeading" class="form-control" />
+                        <span asp-validation-for="ImageRightTopHeading" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ImageRightTopParagraph" class="control-label"></label>
+                        <textarea asp-for="ImageRightTopParagraph" class="form-control"></textarea>
+                        <span asp-validation-for="ImageRightTopParagraph" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Image Bottom Right -->
+            <div class="form-group d-flex flex-wrap">
+                <div class="col-md-6">
+                    <label asp-for="MainImageBottomRight" class="control-label"></label>
+                    <input type="file" name="mainImageBottomRightFile" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="ImageRightBottomHeading" class="control-label"></label>
+                        <input asp-for="ImageRightBottomHeading" class="form-control" />
+                        <span asp-validation-for="ImageRightBottomHeading" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ImageRightBottomParagraph" class="control-label"></label>
+                        <textarea asp-for="ImageRightBottomParagraph" class="form-control"></textarea>
+                        <span asp-validation-for="ImageRightBottomParagraph" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
 
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -83,6 +127,7 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+<!-- Blog selection modal -->
 <div class="modal fade" id="blogPopup" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -120,7 +165,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="https://cdn.tiny.cloud/1/xxxx/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/5f03jnyxt3mkb0yuyavvuvvobp0a9y3zrrp1oqhu89aiwgmr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
         tinymce.init({
@@ -136,7 +181,6 @@
         let blogs = [];
         let selectedBlogIds = JSON.parse(document.getElementById("BlogsIdList").value || "[]");
 
-        // Render existing blogs on load
         if (selectedBlogIds.length > 0) renderSelectedBlogs();
 
         document.getElementById("openBlogPopup").addEventListener("click", function () {
@@ -165,7 +209,6 @@
         document.getElementById("addBlogsBtn").addEventListener("click", function () {
             selectedBlogIds = Array.from(document.querySelectorAll("#blogsTable tbody input:checked"))
                 .map(cb => parseInt(cb.value));
-
             renderSelectedBlogs();
             bootstrap.Modal.getInstance(document.getElementById("blogPopup")).hide();
         });

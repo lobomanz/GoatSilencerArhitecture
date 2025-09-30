@@ -48,6 +48,10 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<string>("TextContent")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("UpdatedUtc")
                         .HasColumnType("TEXT");
 
@@ -117,6 +121,9 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("BlogsIdList")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("TEXT");
