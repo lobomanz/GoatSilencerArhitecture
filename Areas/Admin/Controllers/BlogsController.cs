@@ -58,7 +58,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("LayoutType,TextContent,SortOrder")] BlogComponent blogComponent,
+            [Bind("Title,LayoutType,TextContent,SortOrder")] BlogComponent blogComponent,
             IFormFile? image1File,
             IFormFile? image2File,
             List<IFormFile>? images
@@ -104,7 +104,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 var maxSortOrder = await _context.Blogs.MaxAsync(c => (int?)c.SortOrder) ?? 0;
                 blogComponent.SortOrder = maxSortOrder + 1;
                 blogComponent.CreatedUtc = DateTime.UtcNow;
-                blogComponent.UpdatedUtc = DateTime.UtcNow;
 
                 _context.Add(blogComponent);
                 await _context.SaveChangesAsync();
@@ -134,7 +133,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc")] BlogComponent blogComponent,
+            [Bind("Id,Title,LayoutType,TextContent,SortOrder")] BlogComponent blogComponent,
             IFormFile? image1File,
             IFormFile? image2File,
             List<IFormFile>? images,
@@ -221,6 +220,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 _context.BlogImages.RemoveRange(existingComponent.Images);
                 blogComponent.Images = unifiedImages;
 
+                blogComponent.CreatedUtc = existingComponent.CreatedUtc;
                 blogComponent.UpdatedUtc = DateTime.UtcNow;
                 _context.Update(blogComponent);
                 await _context.SaveChangesAsync();

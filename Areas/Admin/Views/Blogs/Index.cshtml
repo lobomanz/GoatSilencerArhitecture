@@ -16,13 +16,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LayoutType)
+                @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TextContent)
+                @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SortOrder)
+                @Html.DisplayNameFor(model => model.CreatedUtc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedUtc)
             </th>
             <th></th>
         </tr>
@@ -32,16 +35,16 @@
         {
             <tr data-id="@item.Id">
                 <td>
-                    @Html.DisplayFor(modelItem => item.LayoutType)
+                    @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    @if(item.TextContent != null)
-                    {
-                        @(item.TextContent.Length > 100 ? item.TextContent.Substring(0, 100) + "..." : item.TextContent)
-                    }
+                    @Html.DisplayFor(modelItem => item.Title)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.SortOrder)
+                    @Html.DisplayFor(modelItem => item.CreatedUtc)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdatedUtc)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

@@ -6,6 +6,7 @@ namespace GoatSilencerArchitecture.Models
     public class BlogComponent
     {
         public int Id { get; set; }
+        [Required]
         public string Title { get; set; } = string.Empty;
 
         [Required]

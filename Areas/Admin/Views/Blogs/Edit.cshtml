@@ -15,6 +15,12 @@
             <input type="hidden" asp-for="SortOrder" />
 
 
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
             <!-- Layout Type -->
             <div class="form-group">
                 <label asp-for="LayoutType" class="control-label"></label>
