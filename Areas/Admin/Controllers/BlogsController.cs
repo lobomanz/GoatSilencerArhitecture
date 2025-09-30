@@ -58,7 +58,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("LayoutType,TextContent,Image1AltText,Image2AltText,SortOrder")] BlogComponent blogComponent,
+            [Bind("LayoutType,TextContent,SortOrder")] BlogComponent blogComponent,
             IFormFile? image1File,
             IFormFile? image2File,
             List<IFormFile>? images
@@ -134,7 +134,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc,Image1AltText,Image2AltText")] BlogComponent blogComponent,
+            [Bind("Id,LayoutType,TextContent,SortOrder,CreatedUtc")] BlogComponent blogComponent,
             IFormFile? image1File,
             IFormFile? image2File,
             List<IFormFile>? images,
@@ -165,7 +165,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 else
                 {
                     blogComponent.Image1Path = existingComponent.Image1Path;
-                    blogComponent.Image1AltText = existingComponent.Image1AltText;
                 }
 
                 // Handle Image2
@@ -179,7 +178,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 else
                 {
                     blogComponent.Image2Path = existingComponent.Image2Path;
-                    blogComponent.Image2AltText = existingComponent.Image2AltText;
                 }
 
                 // Rebuild gallery

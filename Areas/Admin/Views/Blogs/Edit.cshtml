@@ -46,12 +46,9 @@
                 @if (!string.IsNullOrEmpty(Model.Image1Path))
                 {
                     <div class="mt-2">
-                        <img src="@Model.Image1Path" alt="@Model.Image1AltText" style="max-width:200px;" />
+                        <img src="@Model.Image1Path" alt="" style="max-width:200px;" />
                     </div>
                 }
-                <label>Image 1 Alt Text</label>
-                <input asp-for="Image1AltText" class="form-control" />
-                <span asp-validation-for="Image1AltText" class="text-danger"></span>
             </div>
 
             <!-- Image 2 -->
@@ -61,12 +58,9 @@
                 @if (!string.IsNullOrEmpty(Model.Image2Path))
                 {
                     <div class="mt-2">
-                        <img src="@Model.Image2Path" alt="@Model.Image2AltText" style="max-width:200px;" />
+                        <img src="@Model.Image2Path" alt="" style="max-width:200px;" />
                     </div>
                 }
-                <label>Image 2 Alt Text</label>
-                <input asp-for="Image2AltText" class="form-control" />
-                <span asp-validation-for="Image2AltText" class="text-danger"></span>
             </div>
 
             <!-- Gallery -->

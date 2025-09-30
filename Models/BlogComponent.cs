@@ -15,9 +15,7 @@ namespace GoatSilencerArchitecture.Models
         public string? TextContent { get; set; } = "";
 
         public string? Image1Path { get; set; }
-        public string? Image1AltText { get; set; }
         public string? Image2Path { get; set; } // For layout-type-3
-        public string? Image2AltText { get; set; }
 
         public int SortOrder { get; set; }
 
