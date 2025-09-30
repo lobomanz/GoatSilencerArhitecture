@@ -30,5 +30,7 @@ namespace GoatSilencerArchitecture.Models
         public string? ImageLeftParagraph { get; set; }
         public string? ImageRightTopParagraph { get; set; }
         public string? ImageRightBottomParagraph { get; set; }
+
+        public string? BlogsIdList { get; set; }
     }
 }

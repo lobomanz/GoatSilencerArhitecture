@@ -6,6 +6,7 @@ namespace GoatSilencerArchitecture.Models
     public class BlogComponent
     {
         public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         [Required]
         public string LayoutType { get; set; } = ""; // e.g., "layout-type-1", "layout-type-10"

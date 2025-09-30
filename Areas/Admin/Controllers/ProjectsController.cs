@@ -68,7 +68,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                     projects = projects.OrderBy(p => p.CreatedUtc);
                     break;
                 default:
-                    projects = projects.OrderByDescending(p => p.UpdatedUtc); // Default sort by last updated
+                    projects = projects.OrderByDescending(p => p.UpdatedUtc);
                     break;
             }
 
@@ -103,7 +103,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph")] Project project,
+            [Bind("Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project project,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
             IFormFile? mainImageBottomRightFile
@@ -148,7 +148,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph")] Project postedProject,
+            [Bind("Id,Title,Description,IsPublished,SortOrder,RichTextContent,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project postedProject,
             IFormFile? mainImageLeftFile,
             IFormFile? mainImageTopRightFile,
             IFormFile? mainImageBottomRightFile
@@ -164,6 +164,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 projectToUpdate.IsPublished = postedProject.IsPublished;
                 projectToUpdate.SortOrder = postedProject.SortOrder;
                 projectToUpdate.RichTextContent = postedProject.RichTextContent;
+                projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
                 projectToUpdate.UpdatedUtc = DateTime.UtcNow;
 
                 if (mainImageLeftFile != null)
@@ -210,6 +211,25 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         private bool ProjectExists(int id)
         {
             return _context.Projects.Any(e => e.Id == id);
+        }
+
+        // GET: Admin/Projects/GetAllBlogs
+        [HttpGet]
+        public async Task<IActionResult> GetAllBlogs()
+        {
+            var blogs = await _context.Blogs
+                .Select(b => new
+                {
+                    id = b.Id,
+                    title = b.Title,
+                    layoutType = b.LayoutType,
+                    createdUtc = b.CreatedUtc,
+                    updatedUtc = b.UpdatedUtc
+                })
+                .OrderByDescending(b => b.updatedUtc)
+                .ToListAsync();
+
+            return Json(blogs);
         }
     }
 }
