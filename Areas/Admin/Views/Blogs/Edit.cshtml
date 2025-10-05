@@ -14,7 +14,6 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="SortOrder" />
 
-
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -48,25 +47,19 @@
             <!-- Image 1 -->
             <div class="form-group" id="image1Group">
                 <label>Image 1</label>
-                <input type="file" name="image1File" class="form-control" />
-                @if (!string.IsNullOrEmpty(Model.Image1Path))
-                {
-                    <div class="mt-2">
-                        <img src="@Model.Image1Path" alt="" style="max-width:200px;" />
-                    </div>
-                }
+                <input type="file" name="image1File" id="image1File" class="form-control" />
+                <div class="mt-2">
+                    <img src="@Model.Image1Path" id="image1Preview" alt="" style="max-width:200px; @(string.IsNullOrEmpty(Model.Image1Path) ? "display:none;" : "")" />
+                </div>
             </div>
 
             <!-- Image 2 -->
             <div class="form-group" id="image2Group">
                 <label>Image 2 (for Layout Type 3)</label>
-                <input type="file" name="image2File" class="form-control" />
-                @if (!string.IsNullOrEmpty(Model.Image2Path))
-                {
-                    <div class="mt-2">
-                        <img src="@Model.Image2Path" alt="" style="max-width:200px;" />
-                    </div>
-                }
+                <input type="file" name="image2File" id="image2File" class="form-control" />
+                <div class="mt-2">
+                    <img src="@Model.Image2Path" id="image2Preview" alt="" style="max-width:200px; @(string.IsNullOrEmpty(Model.Image2Path) ? "display:none;" : "")" />
+                </div>
             </div>
 
             <!-- Gallery -->
@@ -91,6 +84,7 @@
 
             <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <button type="button" id="preview-button" class="btn btn-info">Preview Blog</button>
             </div>
         </form>
     </div>
@@ -98,6 +92,13 @@
 
 <div>
     <a asp-action="Index">Back to List</a>
+</div>
+
+<div id="preview-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; width: 80%; height: 80%; overflow: auto;">
+        <button id="close-preview" style="position: absolute; top: 10px; right: 10px;">Close</button>
+        <div id="preview-content"></div>
+    </div>
 </div>
 
 @section Styles {
@@ -237,6 +238,73 @@
                 reader.readAsDataURL(file);
             }
         });
-    </script>
 
+        // Image preview logic
+        let image1DataUrl = null;
+        let image2DataUrl = null;
+
+        function setupImagePreview(fileInputId, previewImgId, dataUrlVar) {
+            const fileInput = document.getElementById(fileInputId);
+            const previewImg = document.getElementById(previewImgId);
+
+            fileInput.addEventListener('change', function (event) {
+                if (event.target.files && event.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImg.src = e.target.result;
+                        previewImg.style.display = 'block';
+                        if (dataUrlVar === 'image1') {
+                            image1DataUrl = e.target.result;
+                        } else if (dataUrlVar === 'image2') {
+                            image2DataUrl = e.target.result;
+                        }
+                    };
+                    reader.readAsDataURL(event.target.files[0]);
+                }
+            });
+        }
+
+        setupImagePreview('image1File', 'image1Preview', 'image1');
+        setupImagePreview('image2File', 'image2Preview', 'image2');
+
+        // Preview button logic
+        document.getElementById('preview-button').addEventListener('click', function () {
+            tinymce.triggerSave();
+            const form = document.getElementById('edit-form');
+            const formData = new FormData(form);
+            const blogComponent = {
+                Id: formData.get('Id'),
+                Title: formData.get('Title'),
+                LayoutType: formData.get('LayoutType'),
+                TextContent: formData.get('TextContent'),
+                Image1Path: image1DataUrl ? image1DataUrl : '@Model.Image1Path',
+                Image2Path: image2DataUrl ? image2DataUrl : '@Model.Image2Path',
+                Images: []
+            };
+
+            // Handle existing images for gallery
+            document.querySelectorAll("input[name='existingImages']").forEach(input => {
+                blogComponent.Images.push({ ImageUrl: input.value, Title: '', AltText: '' });
+            });
+
+            fetch('/Admin/Blogs/Preview',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify(blogComponent)
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('preview-content').innerHTML = html;
+                document.getElementById('preview-popup').style.display = 'block';
+            });
+        });
+
+        document.getElementById('close-preview').addEventListener('click', function () {
+            document.getElementById('preview-popup').style.display = 'none';
+        });
+    </script>
 }

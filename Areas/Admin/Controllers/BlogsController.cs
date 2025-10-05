@@ -283,6 +283,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View(blogComponent);
         }
 
+        [HttpPost]
+        public IActionResult Preview([FromBody] BlogComponent blogComponent)
+        {
+            return PartialView("_BlogPreview", blogComponent);
+        }
+
         // GET: Admin/Blogs/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

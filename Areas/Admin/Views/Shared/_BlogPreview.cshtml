@@ -1,0 +1,126 @@
+@model GoatSilencerArchitecture.Models.BlogComponent
+@using GoatSilencerArchitecture.Utilities
+
+<link rel="stylesheet" href="~/css/layouts.css" asp-append-version="true" />
+
+<section class="container-layout @Model.LayoutType">
+    @if (Model.LayoutType == "layout-type-1")
+    {
+        <div class="text-content">
+            @Html.Raw(Model.TextContent)
+        </div>
+        <div class="image-content">
+            @if (!string.IsNullOrEmpty(Model.Image1Path))
+            {
+                <img src="@Url.Content(Model.Image1Path)" alt="@AltTextHelper.GenerateAltText(Model.Image1Path)" />
+            }
+        </div>
+    }
+    else if (Model.LayoutType == "layout-type-2")
+    {
+        <div class="image-content">
+            @if (!string.IsNullOrEmpty(Model.Image1Path))
+            {
+                <img src="@Url.Content(Model.Image1Path)" alt="@AltTextHelper.GenerateAltText(Model.Image1Path)" />
+            }
+        </div>
+        <div class="text-content">
+            @Html.Raw(Model.TextContent)
+        </div>
+    }
+    else if (Model.LayoutType == "layout-type-3")
+    {
+        <div class="image-content-left">
+            @if (!string.IsNullOrEmpty(Model.Image1Path))
+            {
+                <img src="@Url.Content(Model.Image1Path)" alt="@AltTextHelper.GenerateAltText(Model.Image1Path)" />
+            }
+        </div>
+        <div class="text-content">
+            @Html.Raw(Model.TextContent)
+        </div>
+        <div class="image-content-right">
+            @if (!string.IsNullOrEmpty(Model.Image2Path))
+            {
+                <img src="@Url.Content(Model.Image2Path)" alt="@AltTextHelper.GenerateAltText(Model.Image2Path)" />
+            }
+        </div>
+    }
+    else if (Model.LayoutType == "layout-type-4")
+    {
+        <div class="image-content image-float-right">
+            @if (!string.IsNullOrEmpty(Model.Image1Path))
+            {
+                <img src="@Url.Content(Model.Image1Path)" alt="@AltTextHelper.GenerateAltText(Model.Image1Path)" />
+            }
+        </div>
+        <div class="text-content">
+            @Html.Raw(Model.TextContent)
+        </div>
+    }
+    else if (Model.LayoutType == "layout-type-5")
+    {
+        <div class="image-content image-float-left">
+            @if (!string.IsNullOrEmpty(Model.Image1Path))
+            {
+                <img src="@Url.Content(Model.Image1Path)" alt="@AltTextHelper.GenerateAltText(Model.Image1Path)" />
+            }
+        </div>
+        <div class="text-content">
+            @Html.Raw(Model.TextContent)
+        </div>
+    }
+    else if (Model.LayoutType == "layout-type-6")
+    {
+        <div class="text-content full-width">
+            @Html.Raw(Model.TextContent)
+        </div>
+    }
+    else if (Model.LayoutType == "layout-type-7")
+    {
+        <div class="image-content full-width">
+            @if (!string.IsNullOrEmpty(Model.Image1Path))
+            {
+                <img src="@Url.Content(Model.Image1Path)" alt="@AltTextHelper.GenerateAltText(Model.Image1Path)" />
+            }
+        </div>
+    }
+    else if (Model.LayoutType == "layout-type-8")
+    {
+        if (Model.Images != null && Model.Images.Any())
+        {
+            var carouselId = $"carousel-{Model.Id}";
+            <div id="@carouselId" class="carousel slide mb-4" data-bs-ride="carousel" style="width:100%;">
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.Images.Count; i++)
+                    {
+                        var img = Model.Images.ElementAt(i);
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@img.ImageUrl" class="d-block w-100" style="max-height:500px; object-fit:cover;" alt="@AltTextHelper.GenerateAltText(img.ImageUrl)" />
+                            @if (!string.IsNullOrEmpty(img.Title))
+                            {
+                                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                    <p>@img.Title</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+                <div class="carousel-indicators">
+                    @for (int i = 0; i < Model.Images.Count; i++)
+                    {
+                        <button type="button" data-bs-target="#@carouselId" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-label="Slide @(i + 1)"></button>
+                    }
+                </div>
+            </div>
+        }
+    }
+</section>
