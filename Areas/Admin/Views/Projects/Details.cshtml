@@ -30,48 +30,26 @@
     </dl>
 </div>
 
-<h5>Main Images</h5>
+<h5>Image Sections</h5>
 <div class="row mb-3">
-    @if (!string.IsNullOrEmpty(Model.MainImageLeft))
+    @foreach (var section in Model.ImageSections)
     {
         <div class="col-md-4">
-            <img src="@Model.MainImageLeft" class="img-fluid mb-2" />
-            @if (!string.IsNullOrEmpty(Model.ImageLeftHeading))
+            @if (!string.IsNullOrEmpty(section.ImageUrl))
             {
-                <h6>@Model.ImageLeftHeading</h6>
+                <img src="@(section.ImageUrl)" class="img-fluid mb-2" />
             }
-            @if (!string.IsNullOrEmpty(Model.ImageLeftParagraph))
+            @if (!string.IsNullOrEmpty(section.Heading))
             {
-                <p>@Model.ImageLeftParagraph</p>
+                <h6>@(section.Heading)</h6>
             }
+            @if (!string.IsNullOrEmpty(section.Paragraph))
+            {
+                <p>@(section.Paragraph)</p>
+            }
+            <p><em>Position: @(section.Position)</em></p>
         </div>
     }
-    <div class="col-md-8">
-        @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
-        {
-            <img src="@Model.MainImageTopRight" class="img-fluid mb-2" />
-            @if (!string.IsNullOrEmpty(Model.ImageRightTopHeading))
-            {
-                <h6>@Model.ImageRightTopHeading</h6>
-            }
-            @if (!string.IsNullOrEmpty(Model.ImageRightTopParagraph))
-            {
-                <p>@Model.ImageRightTopParagraph</p>
-            }
-        }
-        @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
-        {
-            <img src="@Model.MainImageBottomRight" class="img-fluid mb-2" />
-            @if (!string.IsNullOrEmpty(Model.ImageRightBottomHeading))
-            {
-                <h6>@Model.ImageRightBottomHeading</h6>
-            }
-            @if (!string.IsNullOrEmpty(Model.ImageRightBottomParagraph))
-            {
-                <p>@Model.ImageRightBottomParagraph</p>
-            }
-        }
-    </div>
 </div>
 
 

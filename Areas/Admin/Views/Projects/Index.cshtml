@@ -98,9 +98,9 @@
         {
             <tr>
                 <td>
-                    @if (!string.IsNullOrEmpty(item.MainImageLeft))
+                    @if (item.ImageSections.Any() && !string.IsNullOrEmpty(item.ImageSections.First().ImageUrl))
                     {
-                        <img src="@item.MainImageLeft" alt="@item.Title" class="thumb-img" style="width:80px; height:60px; object-fit:cover;" />
+                        <img src="@item.ImageSections.First().ImageUrl" alt="@item.Title" class="thumb-img" style="width:80px; height:60px; object-fit:cover;" />
                     }
                     else
                     {

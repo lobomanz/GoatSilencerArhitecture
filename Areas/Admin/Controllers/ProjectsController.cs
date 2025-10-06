@@ -83,6 +83,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             if (id == null) return NotFound();
 
             var project = await _context.Projects
+                .Include(p => p.ImageSections)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null) return NotFound();
@@ -103,10 +104,11 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Description,IsPublished,SortOrder,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project project,
-            IFormFile? mainImageLeftFile,
-            IFormFile? mainImageTopRightFile,
-            IFormFile? mainImageBottomRightFile
+            [Bind("Title,Description,IsPublished,SortOrder,BlogsIdList")] Project project,
+            List<IFormFile> files,
+            List<string> headings,
+            List<string> paragraphs,
+            List<string> positions
         )
         {
             if (ModelState.IsValid)
@@ -114,14 +116,17 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 project.CreatedUtc = DateTime.UtcNow;
                 project.UpdatedUtc = DateTime.UtcNow;
 
-                if (mainImageLeftFile != null)
-                    project.MainImageLeft = await _imageService.SaveAndCompressImage(mainImageLeftFile);
-
-                if (mainImageTopRightFile != null)
-                    project.MainImageTopRight = await _imageService.SaveAndCompressImage(mainImageTopRightFile);
-
-                if (mainImageBottomRightFile != null)
-                    project.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
+                for (int i = 0; i < files.Count; i++)
+                {
+                    var imageUrl = files[i] != null ? await _imageService.SaveAndCompressImage(files[i]) : null;
+                    project.ImageSections.Add(new ImageWithHeadingAndParagraph
+                    {
+                        ImageUrl = imageUrl,
+                        Heading = headings[i],
+                        Paragraph = paragraphs[i],
+                        Position = positions[i]
+                    });
+                }
 
                 _context.Projects.Add(project);
                 await _context.SaveChangesAsync();
@@ -137,7 +142,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            var project = await _context.Projects.Include(p => p.ImageSections).FirstOrDefaultAsync(p => p.Id == id);
             if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", project);
@@ -148,13 +153,15 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,Title,Description,IsPublished,SortOrder,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project postedProject,
-            IFormFile? mainImageLeftFile,
-            IFormFile? mainImageTopRightFile,
-            IFormFile? mainImageBottomRightFile
+            [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList")] Project postedProject,
+            List<IFormFile> files,
+            List<string> headings,
+            List<string> paragraphs,
+            List<string> positions,
+            List<int> imageSectionIds
         )
         {
-            var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            var projectToUpdate = await _context.Projects.Include(p => p.ImageSections).FirstOrDefaultAsync(p => p.Id == id);
             if (projectToUpdate == null) return NotFound();
 
             if (ModelState.IsValid)
@@ -163,18 +170,47 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 projectToUpdate.Description = postedProject.Description;
                 projectToUpdate.IsPublished = postedProject.IsPublished;
                 projectToUpdate.SortOrder = postedProject.SortOrder;
-
                 projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
                 projectToUpdate.UpdatedUtc = DateTime.UtcNow;
 
-                if (mainImageLeftFile != null)
-                    projectToUpdate.MainImageLeft = await _imageService.SaveAndCompressImage(mainImageLeftFile);
+                // Update existing sections and add new ones
+                for (int i = 0; i < positions.Count; i++)
+                {
+                    var sectionId = imageSectionIds[i];
+                    if (sectionId > 0) // Existing section
+                    {
+                        var sectionToUpdate = projectToUpdate.ImageSections.FirstOrDefault(s => s.Id == sectionId);
+                        if (sectionToUpdate != null)
+                        {
+                            if (files.Count > i && files[i] != null)
+                            {
+                                sectionToUpdate.ImageUrl = await _imageService.SaveAndCompressImage(files[i]);
+                            }
+                            sectionToUpdate.Heading = headings[i];
+                            sectionToUpdate.Paragraph = paragraphs[i];
+                            sectionToUpdate.Position = positions[i];
+                        }
+                    }
+                    else // New section
+                    {
+                        var imageUrl = files.Count > i && files[i] != null ? await _imageService.SaveAndCompressImage(files[i]) : null;
+                        projectToUpdate.ImageSections.Add(new ImageWithHeadingAndParagraph
+                        {
+                            ImageUrl = imageUrl,
+                            Heading = headings[i],
+                            Paragraph = paragraphs[i],
+                            Position = positions[i]
+                        });
+                    }
+                }
 
-                if (mainImageTopRightFile != null)
-                    projectToUpdate.MainImageTopRight = await _imageService.SaveAndCompressImage(mainImageTopRightFile);
-
-                if (mainImageBottomRightFile != null)
-                    projectToUpdate.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
+                // Remove deleted sections
+                var submittedIds = imageSectionIds.Where(id => id > 0).ToList();
+                var sectionsToRemove = projectToUpdate.ImageSections.Where(s => s.Id > 0 && !submittedIds.Contains(s.Id)).ToList();
+                foreach (var section in sectionsToRemove)
+                {
+                    _context.Remove(section);
+                }
 
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

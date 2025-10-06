@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GoatSilencerArchitecture.Services.Validation;
 
@@ -16,18 +17,7 @@ namespace GoatSilencerArchitecture.Models
 
         public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
-
-        public string? MainImageLeft { get; set; }
-        public string? MainImageTopRight { get; set; }
-        public string? MainImageBottomRight { get; set; }
-
-
-        public string? ImageLeftHeading { get; set; }
-        public string? ImageRightTopHeading { get; set; }
-        public string? ImageRightBottomHeading { get; set; }
-        public string? ImageLeftParagraph { get; set; }
-        public string? ImageRightTopParagraph { get; set; }
-        public string? ImageRightBottomParagraph { get; set; }
+        public List<ImageWithHeadingAndParagraph> ImageSections { get; set; } = new List<ImageWithHeadingAndParagraph>();
 
         public string? BlogsIdList { get; set; }
     }

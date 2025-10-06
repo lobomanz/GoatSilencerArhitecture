@@ -10,72 +10,30 @@
 
 
 <div class="projects-container">
-    <!-- LEFT GLOBAL COLUMN -->
-    <div class="projects-left">
-        @foreach (var project in Model)
+    @foreach (var project in Model)
+    {
+        foreach (var section in project.ImageSections)
         {
             <div class="project-block">
-                @if (!string.IsNullOrEmpty(project.MainImageLeft))
+                @if (!string.IsNullOrEmpty(section.ImageUrl))
                 {
                     <a asp-action="Details" asp-route-id="@project.Id">
-                        <img src="@project.MainImageLeft" alt="@project.ImageLeftHeading" />
+                        <img src="@(section.ImageUrl)" alt="@(section.Heading)" />
                     </a>
                 }
 
-                @if (!string.IsNullOrEmpty(project.ImageLeftHeading))
+                @if (!string.IsNullOrEmpty(section.Heading))
                 {
-                    <div class="project-heading">@project.ImageLeftHeading</div>
+                    <div class="project-heading">@(section.Heading)</div>
                 }
 
-                @if (!string.IsNullOrEmpty(project.ImageLeftParagraph))
+                @if (!string.IsNullOrEmpty(section.Paragraph))
                 {
-                    <div class="project-paragraph">@project.ImageLeftParagraph</div>
+                    <div class="project-paragraph">@(section.Paragraph)</div>
                 }
             </div>
         }
-    </div>
-
-    <!-- RIGHT GLOBAL COLUMN -->
-    <div class="projects-right">
-        @foreach (var project in Model)
-        {
-            <div class="project-block">
-                @if (!string.IsNullOrEmpty(project.MainImageTopRight))
-                {
-                    <a asp-action="Details" asp-route-id="@project.Id">
-                        <img src="@project.MainImageTopRight" alt="@project.ImageRightTopHeading" />
-                    </a>
-                }
-
-                @if (!string.IsNullOrEmpty(project.ImageRightTopHeading))
-                {
-                    <div class="project-heading">@project.ImageRightTopHeading</div>
-                }
-
-                @if (!string.IsNullOrEmpty(project.ImageRightTopParagraph))
-                {
-                    <div class="project-paragraph">@project.ImageRightTopParagraph</div>
-                }
-
-                @if (!string.IsNullOrEmpty(project.MainImageBottomRight))
-                {
-                    <a asp-action="Details" asp-route-id="@project.Id">
-                        <img src="@project.MainImageBottomRight" alt="@project.ImageRightBottomHeading" />
-                    </a>
-                }
-
-                @if (!string.IsNullOrEmpty(project.ImageRightBottomHeading))
-                {
-                    <div class="project-heading">@project.ImageRightBottomHeading</div>
-                }
-
-                @if (!string.IsNullOrEmpty(project.ImageRightBottomParagraph))
-                {
-                    <div class="project-paragraph">@project.ImageRightBottomParagraph</div>
-                }
-            </div>
-        }
-    </div>
+    }
 </div>
 
 @section Scripts {
