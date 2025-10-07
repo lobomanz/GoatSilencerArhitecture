@@ -12,6 +12,13 @@
     <p>@Model.Description</p>
 
     <div class="mb-3">
+        @if (Model.MainImage != null && !string.IsNullOrEmpty(Model.MainImage.ImageUrl))
+        {
+            <img src="@(Model.MainImage.ImageUrl)" class="thumb-img" />
+        }
+    </div>
+
+    <div class="mb-3">
         @foreach (var section in Model.ImageSections)
         {
             @if (!string.IsNullOrEmpty(section.ImageUrl))

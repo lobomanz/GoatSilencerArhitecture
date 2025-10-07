@@ -30,6 +30,20 @@
     </dl>
 </div>
 
+<h5>Main Image</h5>
+<div class="row mb-3">
+    <div class="col-md-4">
+        @if (Model.MainImage != null && !string.IsNullOrEmpty(Model.MainImage.ImageUrl))
+        {
+            <img src="@Model.MainImage.ImageUrl" class="img-fluid mb-2" />
+        }
+        else
+        {
+            <p>No main image set for this project.</p>
+        }
+    </div>
+</div>
+
 <h5>Image Sections</h5>
 <div class="row mb-3">
     @foreach (var section in Model.ImageSections)

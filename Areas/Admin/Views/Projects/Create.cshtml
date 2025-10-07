@@ -44,6 +44,13 @@
             <!-- Hidden BlogsIdList -->
             <input type="hidden" id="BlogsIdList" name="BlogsIdList" value="@Model.BlogsIdList" />
 
+            <!-- Main Image -->
+            <div class="form-group">
+                <label for="mainImageFile" class="control-label">Main Image</label>
+                <input type="file" id="mainImageFile" name="mainImageFile" class="form-control" />
+                <img id="mainImagePreview" src="#" alt="Main Image Preview" style="display: none; max-width: 200px; margin-top: 10px;" />
+            </div>
+
             <!-- Blog Selector -->
             <div class="form-group">
                 <button type="button" class="btn btn-secondary" id="openBlogPopup">Add Blogs</button>
@@ -240,5 +247,14 @@
         function updateHiddenField() {
             document.getElementById("BlogsIdList").value = JSON.stringify(selectedBlogIds);
         }
+
+        document.getElementById('mainImageFile').addEventListener('change', function (e) {
+            const [file] = e.target.files;
+            if (file) {
+                const preview = document.getElementById('mainImagePreview');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+            }
+        });
     </script>
 }

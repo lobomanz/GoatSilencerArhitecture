@@ -56,7 +56,7 @@
 <table class="table table-striped align-middle">
     <thead>
         <tr>
-            <th>Thumbnail</th>
+            <th>Main Image</th>
             <th class="@GetSortClass("SortOrder")">
                 <a asp-action="Index"
                    asp-route-sortOrder="@ViewData["SortOrderSortParm"]"
@@ -98,9 +98,9 @@
         {
             <tr>
                 <td>
-                    @if (item.ImageSections.Any() && !string.IsNullOrEmpty(item.ImageSections.First().ImageUrl))
+                    @if (item.MainImage != null && !string.IsNullOrEmpty(item.MainImage.ImageUrl))
                     {
-                        <img src="@item.ImageSections.First().ImageUrl" alt="@item.Title" class="thumb-img" style="width:80px; height:60px; object-fit:cover;" />
+                        <img src="@item.MainImage.ImageUrl" alt="@item.MainImage.AltText" class="thumb-img" style="width:80px; height:60px; object-fit:cover;" />
                     }
                     else
                     {

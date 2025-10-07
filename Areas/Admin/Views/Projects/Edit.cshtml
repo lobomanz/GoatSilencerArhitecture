@@ -46,6 +46,24 @@
             <!-- Hidden BlogsIdList -->
             <input type="hidden" id="BlogsIdList" name="BlogsIdList" value="@Model.BlogsIdList" />
 
+            <!-- Main Image -->
+            <div class="form-group">
+                <label class="control-label">Main Image</label>
+                @if (Model.MainImage != null)
+                {
+                    <div id="main-image-container">
+                        <img id="mainImagePreview" src="@Model.MainImage.ImageUrl" style="max-width: 200px;" class="mt-2" />
+                        <button type="button" id="remove-main-image-btn" class="btn btn-danger btn-sm">Remove</button>
+                    </div>
+                }
+                else
+                {
+                    <img id="mainImagePreview" src="#" alt="Main Image Preview" style="display: none; max-width: 200px; margin-top: 10px;" />
+                }
+                <input type="file" id="mainImageFile" name="mainImageFile" class="form-control" />
+                <input type="hidden" asp-for="MainImageId" />
+            </div>
+
             <!-- Blog Selector -->
             <div class="form-group">
                 <button type="button" class="btn btn-secondary" id="openBlogPopup">Add Blogs</button>
@@ -295,5 +313,19 @@
         function updateHiddenField() {
             document.getElementById("BlogsIdList").value = JSON.stringify(selectedBlogIds);
         }
+
+        document.getElementById('remove-main-image-btn')?.addEventListener('click', function () {
+            document.getElementById('main-image-container').remove();
+            document.querySelector('input[name="MainImageId"]').value = '';
+        });
+
+        document.getElementById('mainImageFile').addEventListener('change', function (e) {
+            const [file] = e.target.files;
+            if (file) {
+                const preview = document.getElementById('mainImagePreview');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+            }
+        });
     </script>
 }

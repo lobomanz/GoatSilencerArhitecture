@@ -38,7 +38,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-            var projects = from p in _context.Projects
+            var projects = from p in _context.Projects.Include(p => p.MainImage)
                            select p;
 
             if (!string.IsNullOrEmpty(searchString))
@@ -84,6 +84,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             var project = await _context.Projects
                 .Include(p => p.ImageSections)
+                .Include(p => p.MainImage)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null) return NotFound();
@@ -105,6 +106,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("Title,Description,IsPublished,SortOrder,BlogsIdList")] Project project,
+            IFormFile mainImageFile,
             List<IFormFile> files,
             List<string> headings,
             List<string> paragraphs,
@@ -115,6 +117,15 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             {
                 project.CreatedUtc = DateTime.UtcNow;
                 project.UpdatedUtc = DateTime.UtcNow;
+
+                if (mainImageFile != null)
+                {
+                    var imageUrl = await _imageService.SaveAndCompressImage(mainImageFile);
+                    var image = new ImageModel { ImageUrl = imageUrl, AltText = project.Title };
+                    _context.BlogImages.Add(image);
+                    await _context.SaveChangesAsync();
+                    project.MainImageId = image.Id;
+                }
 
                 for (int i = 0; i < files.Count; i++)
                 {
@@ -133,7 +144,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-
             return View("~/Areas/Admin/Views/Projects/Create.cshtml", project);
         }
 
@@ -142,7 +152,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _context.Projects.Include(p => p.ImageSections).FirstOrDefaultAsync(p => p.Id == id);
+            var project = await _context.Projects.Include(p => p.ImageSections).Include(p => p.MainImage).FirstOrDefaultAsync(p => p.Id == id);
             if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", project);
@@ -153,7 +163,8 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList")] Project postedProject,
+            [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList,MainImageId")] Project postedProject,
+            IFormFile mainImageFile,
             List<IFormFile> files,
             List<string> headings,
             List<string> paragraphs,
@@ -161,7 +172,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             List<int> imageSectionIds
         )
         {
-            var projectToUpdate = await _context.Projects.Include(p => p.ImageSections).FirstOrDefaultAsync(p => p.Id == id);
+            var projectToUpdate = await _context.Projects.Include(p => p.ImageSections).Include(p => p.MainImage).FirstOrDefaultAsync(p => p.Id == id);
             if (projectToUpdate == null) return NotFound();
 
             if (ModelState.IsValid)
@@ -172,6 +183,19 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 projectToUpdate.SortOrder = postedProject.SortOrder;
                 projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
                 projectToUpdate.UpdatedUtc = DateTime.UtcNow;
+
+                if (mainImageFile != null)
+                {
+                    var imageUrl = await _imageService.SaveAndCompressImage(mainImageFile);
+                    var image = new ImageModel { ImageUrl = imageUrl, AltText = projectToUpdate.Title };
+                    _context.BlogImages.Add(image);
+                    await _context.SaveChangesAsync();
+                    projectToUpdate.MainImageId = image.Id;
+                }
+                else
+                {
+                    projectToUpdate.MainImageId = postedProject.MainImageId;
+                }
 
                 // Update existing sections and add new ones
                 for (int i = 0; i < positions.Count; i++)
@@ -215,7 +239,6 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", projectToUpdate);
         }
 
@@ -224,7 +247,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.Id == id);
+            var project = await _context.Projects.Include(p => p.MainImage).FirstOrDefaultAsync(m => m.Id == id);
             if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Delete.cshtml", project);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using GoatSilencerArchitecture.Services.Validation;
 
 namespace GoatSilencerArchitecture.Models
@@ -20,5 +21,9 @@ namespace GoatSilencerArchitecture.Models
         public List<ImageWithHeadingAndParagraph> ImageSections { get; set; } = new List<ImageWithHeadingAndParagraph>();
 
         public string? BlogsIdList { get; set; }
+
+        [ForeignKey("MainImage")]
+        public int? MainImageId { get; set; }
+        public ImageModel? MainImage { get; set; }
     }
 }
