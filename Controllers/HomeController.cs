@@ -18,6 +18,7 @@ namespace GoatSilencerArchitecture.Controllers
             // Only published projects
             var projects = await _context.Projects
                 .Where(g => g.IsPublished)
+                .Include(p => p.MainImage) // Add this
                 .OrderByDescending(g => g.UpdatedUtc)
                 .ToListAsync();
 
