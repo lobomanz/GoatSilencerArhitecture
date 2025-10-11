@@ -28,7 +28,10 @@
                 <div class="image-content">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(component.Image1Path))">
+                            <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        </picture>
                     }
                 </div>
             }
@@ -37,7 +40,10 @@
                 <div class="image-content">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(component.Image1Path))">
+                            <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        </picture>
                     }
                 </div>
                 <div class="text-content">
@@ -49,7 +55,10 @@
                 <div class="image-content-left">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(component.Image1Path))">
+                            <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        </picture>
                     }
                 </div>
                 <div class="text-content">
@@ -58,7 +67,10 @@
                 <div class="image-content-right">
                     @if (!string.IsNullOrEmpty(component.Image2Path))
                     {
-                        <img src="@Url.Content(component.Image2Path)" alt="@AltTextHelper.GenerateAltText(component.Image2Path)" />
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(component.Image2Path))">
+                            <img src="@Url.Content(component.Image2Path)" alt="@AltTextHelper.GenerateAltText(component.Image2Path)" />
+                        </picture>
                     }
                 </div>
             }
@@ -67,7 +79,10 @@
                 <div class="image-content image-float-right">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(component.Image1Path))">
+                            <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        </picture>
                     }
                 </div>
                 <div class="text-content">
@@ -79,7 +94,10 @@
                 <div class="image-content image-float-left">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(component.Image1Path))">
+                            <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        </picture>
                     }
                 </div>
                 <div class="text-content">
@@ -97,7 +115,10 @@
                 <div class="image-content full-width">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
                     {
-                        <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        <picture>
+                            <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(component.Image1Path))">
+                            <img src="@Url.Content(component.Image1Path)" alt="@AltTextHelper.GenerateAltText(component.Image1Path)" />
+                        </picture>
                     }
                 </div>
             }
@@ -112,7 +133,10 @@
                             {
                                 var img = component.Images.ElementAt(i);
                                 <div class="carousel-item @(i == 0 ? "active" : "")">
-                                    <img src="@img.ImageUrl" class="d-block w-100" style="max-height:500px; object-fit:cover;" alt="@AltTextHelper.GenerateAltText(img.ImageUrl)" />
+                                    <picture>
+                                        <source media="(max-width: 768px)" srcset="@Url.Content(ImageHelper.GetMobileImageUrl(img.ImageUrl))">
+                                        <img src="@img.ImageUrl" class="d-block w-100" style="max-height:500px; object-fit:cover;" alt="@AltTextHelper.GenerateAltText(img.ImageUrl)" />
+                                    </picture>
                                     @if (!string.IsNullOrEmpty(img.Title))
                                     {
                                         <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
