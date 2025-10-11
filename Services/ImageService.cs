@@ -34,47 +34,42 @@ namespace GoatSilencerArchitecture.Services
 
             var uniqueFileName = Guid.NewGuid().ToString();
             var fileExtension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName + fileExtension);
-            var webpFilePath = Path.Combine(uploadsFolder, uniqueFileName + ".webp");
+            var tempFilePath = Path.Combine(uploadsFolder, uniqueFileName + fileExtension);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            using (var stream = new FileStream(tempFilePath, FileMode.Create))
             {
                 await imageFile.CopyToAsync(stream);
             }
 
-            // Process and save as WebP
-            using (var image = await Image.LoadAsync(filePath))
-            {
-                image.Mutate(x => x.Resize(new ResizeOptions
-                {
-                    Size = new Size(1200, 0), // Max width 1200px, height auto
-                    Mode = ResizeMode.Max
-                }));
-                await image.SaveAsync(webpFilePath, new WebpEncoder { Quality = 75 });
-            }
+            var webpFilePath = Path.Combine(uploadsFolder, uniqueFileName + ".webp");
+            var mobileWebpFilePath = Path.Combine(uploadsFolder, uniqueFileName + "_mobile.webp");
+            var jpgFilePath = Path.Combine(uploadsFolder, uniqueFileName + ".jpg");
+            var mobileJpgFilePath = Path.Combine(uploadsFolder, uniqueFileName + "_mobile.jpg");
 
-            // Optionally, save a JPEG fallback for older browsers
-            if (fileExtension != ".jpeg" && fileExtension != ".jpg")
+            using (var image = await Image.LoadAsync(tempFilePath))
             {
-                using (var image = await Image.LoadAsync(filePath))
+                // Desktop versions
+                using (var desktopImage = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(1920, 0), Mode = ResizeMode.Max })))
                 {
-                    image.Mutate(x => x.Resize(new ResizeOptions
-                    {
-                        Size = new Size(1200, 0), // Max width 1200px, height auto
-                        Mode = ResizeMode.Max
-                    }));
-                    await image.SaveAsync(Path.Combine(uploadsFolder, uniqueFileName + ".jpg"), new JpegEncoder { Quality = 75 });
+                    await desktopImage.SaveAsync(webpFilePath, new WebpEncoder { Quality = 75 });
+                    await desktopImage.SaveAsync(jpgFilePath, new JpegEncoder { Quality = 75 });
+                }
+
+                // Mobile versions
+                using (var mobileImage = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(1080, 0), Mode = ResizeMode.Max })))
+                {
+                    await mobileImage.SaveAsync(mobileWebpFilePath, new WebpEncoder { Quality = 75 });
+                    await mobileImage.SaveAsync(mobileJpgFilePath, new JpegEncoder { Quality = 75 });
                 }
             }
-            
-            // Delete original file if it's not a jpg/jpeg and we saved a jpg fallback
-            if (fileExtension != ".jpeg" && fileExtension != ".jpg" && File.Exists(filePath))
+
+            // Delete the original temporary file
+            if (File.Exists(tempFilePath))
             {
-                File.Delete(filePath);
+                File.Delete(tempFilePath);
             }
 
-
-            return "/uploads/" + uniqueFileName + ".webp"; // Return WebP path
+            return "/uploads/" + uniqueFileName + ".webp"; // Return WebP path for desktop
         }
 
         public void DeleteImageFiles(string filePath)
@@ -84,21 +79,26 @@ namespace GoatSilencerArchitecture.Services
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
             var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
 
-            var originalFilePath = Path.Combine(uploadsFolder, fileNameWithoutExtension + Path.GetExtension(filePath));
             var webpFilePath = Path.Combine(uploadsFolder, fileNameWithoutExtension + ".webp");
-            var jpgFilePath = Path.Combine(uploadsFolder, fileNameWithoutExtension + ".jpg"); // For the JPEG fallback
+            var mobileWebpFilePath = Path.Combine(uploadsFolder, fileNameWithoutExtension + "_mobile.webp");
+            var jpgFilePath = Path.Combine(uploadsFolder, fileNameWithoutExtension + ".jpg");
+            var mobileJpgFilePath = Path.Combine(uploadsFolder, fileNameWithoutExtension + "_mobile.jpg");
 
-            if (File.Exists(originalFilePath))
-            {
-                File.Delete(originalFilePath);
-            }
             if (File.Exists(webpFilePath))
             {
                 File.Delete(webpFilePath);
             }
+            if (File.Exists(mobileWebpFilePath))
+            {
+                File.Delete(mobileWebpFilePath);
+            }
             if (File.Exists(jpgFilePath))
             {
                 File.Delete(jpgFilePath);
+            }
+            if (File.Exists(mobileJpgFilePath))
+            {
+                File.Delete(mobileJpgFilePath);
             }
         }
     }
