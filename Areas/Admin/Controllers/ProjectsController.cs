@@ -158,89 +158,115 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", project);
         }
 
-        // POST: Admin/Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
-            int id,
-            [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList,MainImageId")] Project postedProject,
-            IFormFile mainImageFile,
-            List<IFormFile> files,
-            List<string> headings,
-            List<string> paragraphs,
-            List<string> positions,
-            List<int> imageSectionIds
-        )
+     int id,
+     [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList,MainImageId")] Project postedProject,
+     IFormFile? mainImageFile,
+     List<IFormFile>? files,
+     List<string>? headings,
+     List<string>? paragraphs,
+     List<string>? positions,
+     List<int>? imageSectionIds
+ )
         {
-            var projectToUpdate = await _context.Projects.Include(p => p.ImageSections).Include(p => p.MainImage).FirstOrDefaultAsync(p => p.Id == id);
-            if (projectToUpdate == null) return NotFound();
+            var projectToUpdate = await _context.Projects
+                .Include(p => p.ImageSections)
+                .Include(p => p.MainImage)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (ModelState.IsValid)
+            if (projectToUpdate == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return View("~/Areas/Admin/Views/Projects/Edit.cshtml", projectToUpdate);
+
+            // === basic info ===
+            projectToUpdate.Title = postedProject.Title;
+            projectToUpdate.Description = postedProject.Description;
+            projectToUpdate.IsPublished = postedProject.IsPublished;
+            projectToUpdate.SortOrder = postedProject.SortOrder;
+            projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
+            projectToUpdate.UpdatedUtc = DateTime.UtcNow;
+
+            // === main image ===
+            if (mainImageFile != null && mainImageFile.Length > 0)
             {
-                projectToUpdate.Title = postedProject.Title;
-                projectToUpdate.Description = postedProject.Description;
-                projectToUpdate.IsPublished = postedProject.IsPublished;
-                projectToUpdate.SortOrder = postedProject.SortOrder;
-                projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
-                projectToUpdate.UpdatedUtc = DateTime.UtcNow;
+                var imageUrl = await _imageService.SaveAndCompressImage(mainImageFile);
+                var image = new ImageModel { ImageUrl = imageUrl, AltText = projectToUpdate.Title };
+                _context.BlogImages.Add(image);
+                await _context.SaveChangesAsync();
+                projectToUpdate.MainImageId = image.Id;
+            }
+            else
+            {
+                // Keep existing image
+                projectToUpdate.MainImageId = postedProject.MainImageId;
+            }
 
-                if (mainImageFile != null)
+            // === image sections ===
+            files ??= new List<IFormFile>();
+            headings ??= new List<string>();
+            paragraphs ??= new List<string>();
+            positions ??= new List<string>();
+            imageSectionIds ??= new List<int>();
+
+            for (int i = 0; i < positions.Count; i++)
+            {
+                var sectionId = imageSectionIds.ElementAtOrDefault(i);
+                var heading = headings.ElementAtOrDefault(i) ?? string.Empty;
+                var paragraph = paragraphs.ElementAtOrDefault(i) ?? string.Empty;
+                var position = positions.ElementAtOrDefault(i) ?? "Left";
+                var file = files.ElementAtOrDefault(i);
+
+                if (sectionId > 0)
                 {
-                    var imageUrl = await _imageService.SaveAndCompressImage(mainImageFile);
-                    var image = new ImageModel { ImageUrl = imageUrl, AltText = projectToUpdate.Title };
-                    _context.BlogImages.Add(image);
-                    await _context.SaveChangesAsync();
-                    projectToUpdate.MainImageId = image.Id;
+                    // Update existing section
+                    var sectionToUpdate = projectToUpdate.ImageSections.FirstOrDefault(s => s.Id == sectionId);
+                    if (sectionToUpdate != null)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            sectionToUpdate.ImageUrl = await _imageService.SaveAndCompressImage(file);
+                        }
+                        sectionToUpdate.Heading = heading;
+                        sectionToUpdate.Paragraph = paragraph;
+                        sectionToUpdate.Position = position;
+                    }
                 }
                 else
                 {
-                    projectToUpdate.MainImageId = postedProject.MainImageId;
-                }
+                    // Add new section
+                    string? imageUrl = null;
+                    if (file != null && file.Length > 0)
+                        imageUrl = await _imageService.SaveAndCompressImage(file);
 
-                // Update existing sections and add new ones
-                for (int i = 0; i < positions.Count; i++)
-                {
-                    var sectionId = imageSectionIds[i];
-                    if (sectionId > 0) // Existing section
+                    projectToUpdate.ImageSections.Add(new ImageWithHeadingAndParagraph
                     {
-                        var sectionToUpdate = projectToUpdate.ImageSections.FirstOrDefault(s => s.Id == sectionId);
-                        if (sectionToUpdate != null)
-                        {
-                            if (files.Count > i && files[i] != null)
-                            {
-                                sectionToUpdate.ImageUrl = await _imageService.SaveAndCompressImage(files[i]);
-                            }
-                            sectionToUpdate.Heading = headings[i];
-                            sectionToUpdate.Paragraph = paragraphs[i];
-                            sectionToUpdate.Position = positions[i];
-                        }
-                    }
-                    else // New section
-                    {
-                        var imageUrl = files.Count > i && files[i] != null ? await _imageService.SaveAndCompressImage(files[i]) : null;
-                        projectToUpdate.ImageSections.Add(new ImageWithHeadingAndParagraph
-                        {
-                            ImageUrl = imageUrl,
-                            Heading = headings[i],
-                            Paragraph = paragraphs[i],
-                            Position = positions[i]
-                        });
-                    }
+                        ImageUrl = imageUrl,
+                        Heading = heading,
+                        Paragraph = paragraph,
+                        Position = position
+                    });
                 }
-
-                // Remove deleted sections
-                var submittedIds = imageSectionIds.Where(id => id > 0).ToList();
-                var sectionsToRemove = projectToUpdate.ImageSections.Where(s => s.Id > 0 && !submittedIds.Contains(s.Id)).ToList();
-                foreach (var section in sectionsToRemove)
-                {
-                    _context.Remove(section);
-                }
-
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
-            return View("~/Areas/Admin/Views/Projects/Edit.cshtml", projectToUpdate);
+
+            // === remove deleted sections ===
+            var submittedIds = imageSectionIds.Where(x => x > 0).ToList();
+            var sectionsToRemove = projectToUpdate.ImageSections
+                .Where(s => s.Id > 0 && !submittedIds.Contains(s.Id))
+                .ToList();
+
+            foreach (var section in sectionsToRemove)
+            {
+                _context.Remove(section);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Admin/Projects/Delete/5
         public async Task<IActionResult> Delete(int? id)
