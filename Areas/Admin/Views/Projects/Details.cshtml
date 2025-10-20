@@ -27,6 +27,12 @@
 
         <dt class="col-sm-2">Updated</dt>
         <dd class="col-sm-10">@Model.UpdatedUtc.ToString("g")</dd>
+
+        <dt class="col-sm-2">Year Built</dt>
+        <dd class="col-sm-10">@Model.YearBuilt?.ToString("yyyy")</dd>
+
+        <dt class="col-sm-2">Location</dt>
+        <dd class="col-sm-10">@Model.Location</dd>
     </dl>
 </div>
 

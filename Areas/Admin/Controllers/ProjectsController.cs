@@ -43,8 +43,18 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                projects = projects.Where(p => p.Title.Contains(searchString)
-                                       || p.Description.Contains(searchString));
+                var searchStringLower = searchString.ToLower();
+                if (int.TryParse(searchString, out int searchId))
+                {
+                    projects = projects.Where(p => p.Id == searchId ||
+                                           p.Title.ToLower().Contains(searchStringLower) ||
+                                           (p.Description != null && p.Description.ToLower().Contains(searchStringLower)));
+                }
+                else
+                {
+                    projects = projects.Where(p => p.Title.ToLower().Contains(searchStringLower) ||
+                                           (p.Description != null && p.Description.ToLower().Contains(searchStringLower)));
+                }
             }
 
             switch (sortOrder)
@@ -105,7 +115,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Description,IsPublished,SortOrder,BlogsIdList")] Project project,
+            [Bind("Title,Description,IsPublished,SortOrder,BlogsIdList,YearBuilt,Location")] Project project,
             IFormFile mainImageFile,
             List<IFormFile> files,
             List<string> headings,
@@ -162,7 +172,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
      int id,
-     [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList,MainImageId")] Project postedProject,
+     [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList,MainImageId,YearBuilt,Location")] Project postedProject,
      IFormFile? mainImageFile,
      List<IFormFile>? files,
      List<string>? headings,
@@ -188,6 +198,8 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             projectToUpdate.IsPublished = postedProject.IsPublished;
             projectToUpdate.SortOrder = postedProject.SortOrder;
             projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
+            projectToUpdate.YearBuilt = postedProject.YearBuilt;
+            projectToUpdate.Location = postedProject.Location;
             projectToUpdate.UpdatedUtc = DateTime.UtcNow;
 
             // === main image ===

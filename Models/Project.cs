@@ -18,6 +18,8 @@ namespace GoatSilencerArchitecture.Models
 
         public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
+        public DateTime? YearBuilt { get; set; }
+        public string? Location { get; set; }
         public List<ImageWithHeadingAndParagraph> ImageSections { get; set; } = new List<ImageWithHeadingAndParagraph>();
 
         public string? BlogsIdList { get; set; }

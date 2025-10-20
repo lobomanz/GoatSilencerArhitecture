@@ -41,6 +41,18 @@
                 <span asp-validation-for="SortOrder" class="text-danger"></span>
             </div>
 
+            <div class="form-group">
+                <label asp-for="YearBuilt" class="control-label"></label>
+                <input asp-for="YearBuilt" class="form-control" />
+                <span asp-validation-for="YearBuilt" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+
             <!-- Hidden BlogsIdList -->
             <input type="hidden" id="BlogsIdList" name="BlogsIdList" value="@Model.BlogsIdList" />
 

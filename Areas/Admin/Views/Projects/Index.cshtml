@@ -42,11 +42,11 @@
     <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 
-<form asp-action="Index" method="get">
+<form asp-action="Index" method="get" id="search-form">
     <div class="form-actions no-color">
         <p>
             Find by name:
-            <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" id="search-input" />
             <input type="submit" value="Search" class="btn btn-default" /> |
             <a asp-action="Index">Back to Full List</a>
         </p>
@@ -56,6 +56,9 @@
 <table class="table table-striped align-middle">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Id)
+            </th>
             <th>Main Image</th>
             <th class="@GetSortClass("SortOrder")">
                 <a asp-action="Index"
@@ -90,6 +93,12 @@
                     @Html.Raw(GetSortIndicator("UpdatedUtc"))
                 </a>
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().YearBuilt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Location)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -97,6 +106,7 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
                 <td>
                     @if (item.MainImage != null && !string.IsNullOrEmpty(item.MainImage.ImageUrl))
                     {
@@ -112,6 +122,8 @@
                 <td>@Html.DisplayFor(modelItem => item.IsPublished)</td>
                 <td>@Html.DisplayFor(modelItem => item.CreatedUtc)</td>
                 <td>@Html.DisplayFor(modelItem => item.UpdatedUtc)</td>
+                <td>@Html.DisplayFor(modelItem => item.YearBuilt)</td>
+                <td>@Html.DisplayFor(modelItem => item.Location)</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Details</a>
@@ -143,3 +155,20 @@
         Next
     </a>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            let timeout = null;
+            const searchInput = document.getElementById('search-input');
+            const searchForm = document.getElementById('search-form');
+
+            searchInput.addEventListener('input', function (e) {
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    searchForm.submit();
+                }, 1000); // 1000ms delay
+            });
+        })();
+    </script>
+}
