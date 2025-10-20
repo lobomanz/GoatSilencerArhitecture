@@ -5,8 +5,9 @@ using GoatSilencerArchitecture.Models;
 using Microsoft.EntityFrameworkCore;
 using GoatSilencerArchitecture.Services;
 
-namespace GoatSilencerArchitecture.Controllers
+namespace GoatSilencerArchitecture.Areas.Public.Controllers
 {
+    [Area("Public")]
     public class ContactController : Controller
     {
         private readonly ApplicationDbContext _context;

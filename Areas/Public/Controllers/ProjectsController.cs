@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace GoatSilencerArchitecture.Controllers
+namespace GoatSilencerArchitecture.Areas.Public.Controllers
 {
+    [Area("Public")]
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;

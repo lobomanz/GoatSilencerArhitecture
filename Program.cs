@@ -27,7 +27,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Public/Home/Error");
     app.UseHsts();
 }
 
@@ -55,6 +55,6 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=Public}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
