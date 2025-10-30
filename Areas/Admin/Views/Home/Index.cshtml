@@ -20,9 +20,9 @@
             {
                 var gallery = featured[i];
                 <div class="carousel-item @(i == 0 ? "active" : "")">
-                    @if (!string.IsNullOrEmpty(gallery.MainImageLeft))
+                    @if (gallery.MainImage != null && !string.IsNullOrEmpty(gallery.MainImage.ImageUrl))
                     {
-                        <img src="@gallery.MainImageLeft" class="d-block w-100" style="height:400px; object-fit:cover;" alt="@gallery.Title" />
+                        <img src="@gallery.MainImage.ImageUrl" class="d-block w-100" style="height:400px; object-fit:cover;" alt="@gallery.Title" />
                     }
                     else
                     {
@@ -54,9 +54,9 @@
         {
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm">
-                    @if (!string.IsNullOrEmpty(gallery.MainImageLeft))
+                    @if (gallery.MainImage != null && !string.IsNullOrEmpty(gallery.MainImage.ImageUrl))
                     {
-                        <img src="@gallery.MainImageLeft" class="card-img-top" style="height:200px; object-fit:cover;" alt="@gallery.Title" />
+                        <img src="@gallery.MainImage.ImageUrl" class="card-img-top" style="height:200px; object-fit:cover;" alt="@gallery.Title" />
                     }
                     else
                     {

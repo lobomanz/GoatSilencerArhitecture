@@ -43,8 +43,38 @@
                 <span asp-validation-for="SortOrder" class="text-danger"></span>
             </div>
 
+            <div class="form-group">
+                <label asp-for="YearBuilt" class="control-label"></label>
+                <input asp-for="YearBuilt" class="form-control" />
+                <span asp-validation-for="YearBuilt" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+
             <!-- Hidden BlogsIdList -->
             <input type="hidden" id="BlogsIdList" name="BlogsIdList" value="@Model.BlogsIdList" />
+
+            <!-- Main Image -->
+            <div class="form-group">
+                <label class="control-label">Main Image</label>
+                @if (Model.MainImage != null)
+                {
+                    <div id="main-image-container">
+                        <img id="mainImagePreview" src="@Model.MainImage.ImageUrl" style="max-width: 200px;" class="mt-2" />
+                        <button type="button" id="remove-main-image-btn" class="btn btn-danger btn-sm">Remove</button>
+                    </div>
+                }
+                else
+                {
+                    <img id="mainImagePreview" src="#" alt="Main Image Preview" style="display: none; max-width: 200px; margin-top: 10px;" />
+                }
+                <input type="file" id="mainImageFile" name="mainImageFile" class="form-control" />
+                <input type="hidden" asp-for="MainImageId" />
+            </div>
 
             <!-- Blog Selector -->
             <div class="form-group">
@@ -67,64 +97,65 @@
                 </table>
             </div>
 
-            <!-- Main Image Left -->
-            <div class="form-group d-flex flex-wrap">
-                <div class="col-md-6">
-                    <label asp-for="MainImageLeft" class="control-label"></label>
-                    <input type="file" name="mainImageLeftFile" class="form-control" />
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="ImageLeftHeading" class="control-label"></label>
-                        <input asp-for="ImageLeftHeading" class="form-control" />
-                        <span asp-validation-for="ImageLeftHeading" class="text-danger"></span>
+            <!-- Image Sections -->
+            <div id="image-sections-container">
+                @foreach (var section in Model.ImageSections)
+                {
+                    <div class="image-section border p-3 mb-3">
+                        <h5>Image Section</h5>
+                        <div class="form-group">
+                            <label>Position</label>
+                            <select name="positions" class="form-control">
+                                @if (section.Position == "Left")
+                                {
+                                    <option value="Left" selected>Left</option>
+                                    <option value="RightTop">Right Top</option>
+                                    <option value="RightBottom">Right Bottom</option>
+                                }
+                                else if (section.Position == "RightTop")
+                                {
+                                    <option value="Left">Left</option>
+                                    <option value="RightTop" selected>Right Top</option>
+                                    <option value="RightBottom">Right Bottom</option>
+                                }
+                                else if (section.Position == "RightBottom")
+                                {
+                                    <option value="Left">Left</option>
+                                    <option value="RightTop">Right Top</option>
+                                    <option value="RightBottom" selected>Right Bottom</option>
+                                }
+                                else
+                                {
+                                    <option value="Left">Left</option>
+                                    <option value="RightTop">Right Top</option>
+                                    <option value="RightBottom">Right Bottom</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Image</label>
+                            <input type="file" name="files" class="form-control" />
+                            @if (!string.IsNullOrEmpty(section.ImageUrl))
+                            {
+                                <img src="@(section.ImageUrl)" style="max-width: 200px;" class="mt-2" />
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label>Heading</label>
+                            <input type="text" name="headings" class="form-control" value="@(section.Heading)" />
+                        </div>
+                        <div class="form-group">
+                            <label>Paragraph</label>
+                            <textarea name="paragraphs" class="form-control">@(section.Paragraph)</textarea>
+                        </div>
+                        <input type="hidden" name="imageSectionIds" value="@(section.Id)" />
+                        <button type="button" class="btn btn-danger remove-section-btn">Remove Section</button>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="ImageLeftParagraph" class="control-label"></label>
-                        <textarea asp-for="ImageLeftParagraph" class="form-control"></textarea>
-                        <span asp-validation-for="ImageLeftParagraph" class="text-danger"></span>
-                    </div>
-                </div>
+                }
             </div>
 
-            <!-- Main Image Top Right -->
-            <div class="form-group d-flex flex-wrap">
-                <div class="col-md-6">
-                    <label asp-for="MainImageTopRight" class="control-label"></label>
-                    <input type="file" name="mainImageTopRightFile" class="form-control" />
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="ImageRightTopHeading" class="control-label"></label>
-                        <input asp-for="ImageRightTopHeading" class="form-control" />
-                        <span asp-validation-for="ImageRightTopHeading" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="ImageRightTopParagraph" class="control-label"></label>
-                        <textarea asp-for="ImageRightTopParagraph" class="form-control"></textarea>
-                        <span asp-validation-for="ImageRightTopParagraph" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Image Bottom Right -->
-            <div class="form-group d-flex flex-wrap">
-                <div class="col-md-6">
-                    <label asp-for="MainImageBottomRight" class="control-label"></label>
-                    <input type="file" name="mainImageBottomRightFile" class="form-control" />
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="ImageRightBottomHeading" class="control-label"></label>
-                        <input asp-for="ImageRightBottomHeading" class="form-control" />
-                        <span asp-validation-for="ImageRightBottomHeading" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="ImageRightBottomParagraph" class="control-label"></label>
-                        <textarea asp-for="ImageRightBottomParagraph" class="form-control"></textarea>
-                        <span asp-validation-for="ImageRightBottomParagraph" class="text-danger"></span>
-                    </div>
-                </div>
+            <div class="form-group">
+                <button type="button" id="add-section-btn" class="btn btn-secondary">Add Image Section</button>
             </div>
 
             <!-- Save -->
@@ -179,6 +210,47 @@
     }
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
+        let sectionIndex = @Model.ImageSections.Count;
+
+        document.getElementById('add-section-btn').addEventListener('click', function () {
+            const container = document.getElementById('image-sections-container');
+            const sectionHtml = `
+                <div class="image-section border p-3 mb-3">
+                    <h5>Image Section</h5>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <select name="positions" class="form-control">
+                            <option value="Left">Left</option>
+                            <option value="RightTop">Right Top</option>
+                            <option value="RightBottom">Right Bottom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Image</label>
+                        <input type="file" name="files" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Heading</label>
+                        <input type="text" name="headings" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Paragraph</label>
+                        <textarea name="paragraphs" class="form-control"></textarea>
+                    </div>
+                    <input type="hidden" name="imageSectionIds" value="0" />
+                    <button type="button" class="btn btn-danger remove-section-btn">Remove Section</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', sectionHtml);
+            sectionIndex++;
+        });
+
+        document.getElementById('image-sections-container').addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('remove-section-btn')) {
+                e.target.closest('.image-section').remove();
+            }
+        });
+
         let blogs = [];
         let selectedBlogIds = JSON.parse(document.getElementById("BlogsIdList").value || "[]");
 
@@ -253,5 +325,19 @@
         function updateHiddenField() {
             document.getElementById("BlogsIdList").value = JSON.stringify(selectedBlogIds);
         }
+
+        document.getElementById('remove-main-image-btn')?.addEventListener('click', function () {
+            document.getElementById('main-image-container').remove();
+            document.querySelector('input[name="MainImageId"]').value = '';
+        });
+
+        document.getElementById('mainImageFile').addEventListener('change', function (e) {
+            const [file] = e.target.files;
+            if (file) {
+                const preview = document.getElementById('mainImagePreview');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+            }
+        });
     </script>
 }

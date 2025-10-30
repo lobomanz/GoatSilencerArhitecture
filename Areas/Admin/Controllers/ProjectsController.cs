@@ -38,13 +38,23 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
-            var projects = from p in _context.Projects
+            var projects = from p in _context.Projects.Include(p => p.MainImage)
                            select p;
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                projects = projects.Where(p => p.Title.Contains(searchString)
-                                       || p.Description.Contains(searchString));
+                var searchStringLower = searchString.ToLower();
+                if (int.TryParse(searchString, out int searchId))
+                {
+                    projects = projects.Where(p => p.Id == searchId ||
+                                           p.Title.ToLower().Contains(searchStringLower) ||
+                                           (p.Description != null && p.Description.ToLower().Contains(searchStringLower)));
+                }
+                else
+                {
+                    projects = projects.Where(p => p.Title.ToLower().Contains(searchStringLower) ||
+                                           (p.Description != null && p.Description.ToLower().Contains(searchStringLower)));
+                }
             }
 
             switch (sortOrder)
@@ -83,6 +93,8 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             if (id == null) return NotFound();
 
             var project = await _context.Projects
+                .Include(p => p.ImageSections)
+                .Include(p => p.MainImage)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (project == null) return NotFound();
@@ -103,10 +115,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Description,IsPublished,SortOrder,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project project,
-            IFormFile? mainImageLeftFile,
-            IFormFile? mainImageTopRightFile,
-            IFormFile? mainImageBottomRightFile
+            [Bind("Title,Description,IsPublished,SortOrder,BlogsIdList,YearBuilt,Location")] Project project,
+            IFormFile mainImageFile,
+            List<IFormFile> files,
+            List<string> headings,
+            List<string> paragraphs,
+            List<string> positions
         )
         {
             if (ModelState.IsValid)
@@ -114,21 +128,32 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 project.CreatedUtc = DateTime.UtcNow;
                 project.UpdatedUtc = DateTime.UtcNow;
 
-                if (mainImageLeftFile != null)
-                    project.MainImageLeft = await _imageService.SaveAndCompressImage(mainImageLeftFile);
+                if (mainImageFile != null)
+                {
+                    var imageUrl = await _imageService.SaveAndCompressImage(mainImageFile);
+                    var image = new ImageModel { ImageUrl = imageUrl, AltText = project.Title };
+                    _context.BlogImages.Add(image);
+                    await _context.SaveChangesAsync();
+                    project.MainImageId = image.Id;
+                }
 
-                if (mainImageTopRightFile != null)
-                    project.MainImageTopRight = await _imageService.SaveAndCompressImage(mainImageTopRightFile);
-
-                if (mainImageBottomRightFile != null)
-                    project.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
+                for (int i = 0; i < files.Count; i++)
+                {
+                    var imageUrl = files[i] != null ? await _imageService.SaveAndCompressImage(files[i]) : null;
+                    project.ImageSections.Add(new ImageWithHeadingAndParagraph
+                    {
+                        ImageUrl = imageUrl,
+                        Heading = headings[i],
+                        Paragraph = paragraphs[i],
+                        Position = positions[i]
+                    });
+                }
 
                 _context.Projects.Add(project);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
-
             return View("~/Areas/Admin/Views/Projects/Create.cshtml", project);
         }
 
@@ -137,58 +162,130 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            var project = await _context.Projects.Include(p => p.ImageSections).Include(p => p.MainImage).FirstOrDefaultAsync(p => p.Id == id);
             if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Edit.cshtml", project);
         }
 
-        // POST: Admin/Projects/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
-            int id,
-            [Bind("Id,Title,Description,IsPublished,SortOrder,ImageLeftHeading,ImageRightTopHeading,ImageRightBottomHeading,ImageLeftParagraph,ImageRightTopParagraph,ImageRightBottomParagraph,BlogsIdList")] Project postedProject,
-            IFormFile? mainImageLeftFile,
-            IFormFile? mainImageTopRightFile,
-            IFormFile? mainImageBottomRightFile
-        )
+     int id,
+     [Bind("Id,Title,Description,IsPublished,SortOrder,BlogsIdList,MainImageId,YearBuilt,Location")] Project postedProject,
+     IFormFile? mainImageFile,
+     List<IFormFile>? files,
+     List<string>? headings,
+     List<string>? paragraphs,
+     List<string>? positions,
+     List<int>? imageSectionIds
+ )
         {
-            var projectToUpdate = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
-            if (projectToUpdate == null) return NotFound();
+            var projectToUpdate = await _context.Projects
+                .Include(p => p.ImageSections)
+                .Include(p => p.MainImage)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (ModelState.IsValid)
+            if (projectToUpdate == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return View("~/Areas/Admin/Views/Projects/Edit.cshtml", projectToUpdate);
+
+            // === basic info ===
+            projectToUpdate.Title = postedProject.Title;
+            projectToUpdate.Description = postedProject.Description;
+            projectToUpdate.IsPublished = postedProject.IsPublished;
+            projectToUpdate.SortOrder = postedProject.SortOrder;
+            projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
+            projectToUpdate.YearBuilt = postedProject.YearBuilt;
+            projectToUpdate.Location = postedProject.Location;
+            projectToUpdate.UpdatedUtc = DateTime.UtcNow;
+
+            // === main image ===
+            if (mainImageFile != null && mainImageFile.Length > 0)
             {
-                projectToUpdate.Title = postedProject.Title;
-                projectToUpdate.Description = postedProject.Description;
-                projectToUpdate.IsPublished = postedProject.IsPublished;
-                projectToUpdate.SortOrder = postedProject.SortOrder;
-
-                projectToUpdate.BlogsIdList = postedProject.BlogsIdList;
-                projectToUpdate.UpdatedUtc = DateTime.UtcNow;
-
-                if (mainImageLeftFile != null)
-                    projectToUpdate.MainImageLeft = await _imageService.SaveAndCompressImage(mainImageLeftFile);
-
-                if (mainImageTopRightFile != null)
-                    projectToUpdate.MainImageTopRight = await _imageService.SaveAndCompressImage(mainImageTopRightFile);
-
-                if (mainImageBottomRightFile != null)
-                    projectToUpdate.MainImageBottomRight = await _imageService.SaveAndCompressImage(mainImageBottomRightFile);
-
+                var imageUrl = await _imageService.SaveAndCompressImage(mainImageFile);
+                var image = new ImageModel { ImageUrl = imageUrl, AltText = projectToUpdate.Title };
+                _context.BlogImages.Add(image);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                projectToUpdate.MainImageId = image.Id;
+            }
+            else
+            {
+                // Keep existing image
+                projectToUpdate.MainImageId = postedProject.MainImageId;
             }
 
-            return View("~/Areas/Admin/Views/Projects/Edit.cshtml", projectToUpdate);
+            // === image sections ===
+            files ??= new List<IFormFile>();
+            headings ??= new List<string>();
+            paragraphs ??= new List<string>();
+            positions ??= new List<string>();
+            imageSectionIds ??= new List<int>();
+
+            for (int i = 0; i < positions.Count; i++)
+            {
+                var sectionId = imageSectionIds.ElementAtOrDefault(i);
+                var heading = headings.ElementAtOrDefault(i) ?? string.Empty;
+                var paragraph = paragraphs.ElementAtOrDefault(i) ?? string.Empty;
+                var position = positions.ElementAtOrDefault(i) ?? "Left";
+                var file = files.ElementAtOrDefault(i);
+
+                if (sectionId > 0)
+                {
+                    // Update existing section
+                    var sectionToUpdate = projectToUpdate.ImageSections.FirstOrDefault(s => s.Id == sectionId);
+                    if (sectionToUpdate != null)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            sectionToUpdate.ImageUrl = await _imageService.SaveAndCompressImage(file);
+                        }
+                        sectionToUpdate.Heading = heading;
+                        sectionToUpdate.Paragraph = paragraph;
+                        sectionToUpdate.Position = position;
+                    }
+                }
+                else
+                {
+                    // Add new section
+                    string? imageUrl = null;
+                    if (file != null && file.Length > 0)
+                        imageUrl = await _imageService.SaveAndCompressImage(file);
+
+                    projectToUpdate.ImageSections.Add(new ImageWithHeadingAndParagraph
+                    {
+                        ImageUrl = imageUrl,
+                        Heading = heading,
+                        Paragraph = paragraph,
+                        Position = position
+                    });
+                }
+            }
+
+            // === remove deleted sections ===
+            var submittedIds = imageSectionIds.Where(x => x > 0).ToList();
+            var sectionsToRemove = projectToUpdate.ImageSections
+                .Where(s => s.Id > 0 && !submittedIds.Contains(s.Id))
+                .ToList();
+
+            foreach (var section in sectionsToRemove)
+            {
+                _context.Remove(section);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Admin/Projects/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.Id == id);
+            var project = await _context.Projects.Include(p => p.MainImage).FirstOrDefaultAsync(m => m.Id == id);
             if (project == null) return NotFound();
 
             return View("~/Areas/Admin/Views/Projects/Delete.cshtml", project);

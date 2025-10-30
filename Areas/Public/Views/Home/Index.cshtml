@@ -1,0 +1,75 @@
+@model IEnumerable<GoatSilencerArchitecture.Models.Project>
+@using GoatSilencerArchitecture.Utilities
+
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<div class="fullpage-slider">
+    <div class="slider-container">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var project in Model)
+            {
+                var desktopImg = project.MainImage?.ImageUrl ?? "/images/placeholder.jpg";
+                var mobileImg = ImageHelper.GetMobileImageUrl(desktopImg);
+
+                <div class="slide" 
+                     style="background-image: url('@Url.Content(desktopImg)')" 
+                     data-desktop-background="@Url.Content(desktopImg)"
+                     data-mobile-background="@Url.Content(mobileImg)">
+                    <div class="slide-content">
+                        <h2>@project.Title</h2>
+                        <a asp-controller="Projects" asp-action="Details" asp-route-id="@project.Id"
+                           class="btn btn-outline-light mt-2">Look at the project</a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="slider-dots">
+        @if (Model != null)
+        {
+            for (int i = 0; i < Model.Count(); i++)
+            {
+                <div class="dot-container" data-index="@i" role="button" aria-label="Go to slide @(i + 1)" tabindex="0">
+                    <div class="dot"></div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Home/Index.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/Home/Index.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+
+            function updateBackgrounds() {
+                const isMobile = window.innerWidth <= 768;
+                slides.forEach(slide => {
+                    const desktopBg = slide.getAttribute('data-desktop-background');
+                    const mobileBg = slide.getAttribute('data-mobile-background');
+                    
+                    if (isMobile && mobileBg) {
+                        slide.style.backgroundImage = `url('${mobileBg}')`;
+                    } else if (desktopBg) {
+                        slide.style.backgroundImage = `url('${desktopBg}')`;
+                    }
+                });
+            }
+
+            // Initial check
+            updateBackgrounds();
+
+            // Update on resize
+            window.addEventListener('resize', updateBackgrounds);
+        });
+    </script>
+}

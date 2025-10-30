@@ -26,13 +26,7 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Image1AltText")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Image1Path")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Image2AltText")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image2Path")
@@ -116,6 +110,34 @@ namespace GoatSilencerArchitecture.Migrations
                     b.ToTable("BlogImages");
                 });
 
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.ImageWithHeadingAndParagraph", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Heading")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Paragraph")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Position")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ImageWithHeadingAndParagraph");
+                });
+
             modelBuilder.Entity("GoatSilencerArchitecture.Models.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -131,35 +153,14 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ImageLeftHeading")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ImageLeftParagraph")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ImageRightBottomHeading")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ImageRightBottomParagraph")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ImageRightTopHeading")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ImageRightTopParagraph")
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("IsPublished")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("MainImageBottomRight")
+                    b.Property<string>("Location")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("MainImageLeft")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("MainImageTopRight")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("MainImageId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("INTEGER");
@@ -171,7 +172,12 @@ namespace GoatSilencerArchitecture.Migrations
                     b.Property<DateTime>("UpdatedUtc")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("YearBuilt")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("MainImageId");
 
                     b.ToTable("Projects");
                 });
@@ -375,6 +381,26 @@ namespace GoatSilencerArchitecture.Migrations
                         .HasForeignKey("BlogComponentId");
                 });
 
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.ImageWithHeadingAndParagraph", b =>
+                {
+                    b.HasOne("GoatSilencerArchitecture.Models.Project", "Project")
+                        .WithMany("ImageSections")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.Project", b =>
+                {
+                    b.HasOne("GoatSilencerArchitecture.Models.ImageModel", "MainImage")
+                        .WithMany()
+                        .HasForeignKey("MainImageId");
+
+                    b.Navigation("MainImage");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -429,6 +455,11 @@ namespace GoatSilencerArchitecture.Migrations
             modelBuilder.Entity("GoatSilencerArchitecture.Models.BlogComponent", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("GoatSilencerArchitecture.Models.Project", b =>
+                {
+                    b.Navigation("ImageSections");
                 });
 #pragma warning restore 612, 618
         }

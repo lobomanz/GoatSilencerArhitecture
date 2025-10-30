@@ -1,0 +1,48 @@
+﻿@model IEnumerable<GoatSilencerArchitecture.Models.Project>
+
+@{
+    ViewData["Title"] = "Projects";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Projects/Index.css" asp-append-version="true" />
+}
+
+
+<div class="projects-container">
+    @foreach (var project in Model)
+    {
+        foreach (var section in project.ImageSections)
+        {
+            <div class="project-block">
+                @if (!string.IsNullOrEmpty(section.ImageUrl))
+                {
+                    <a asp-action="Details" asp-route-id="@project.Id">
+                        <img src="@(section.ImageUrl)" alt="@(section.Heading)" />
+                    </a>
+                }
+
+                @if (!string.IsNullOrEmpty(section.Heading))
+                {
+                    <div class="project-heading">@(section.Heading)</div>
+                }
+
+                @if (!string.IsNullOrEmpty(section.Paragraph))
+                {
+                    <div class="project-paragraph">@(section.Paragraph)</div>
+                }
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const projectBlocks = document.querySelectorAll('.project-block');
+            projectBlocks.forEach(function(block) {
+                block.classList.add('show');
+            });
+        });
+    </script>
+}

@@ -12,17 +12,19 @@
     <p>@Model.Description</p>
 
     <div class="mb-3">
-        @if (!string.IsNullOrEmpty(Model.MainImageLeft))
+        @if (Model.MainImage != null && !string.IsNullOrEmpty(Model.MainImage.ImageUrl))
         {
-            <img src="@Model.MainImageLeft" class="thumb-img" />
+            <img src="@(Model.MainImage.ImageUrl)" class="thumb-img" />
         }
-        @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
+    </div>
+
+    <div class="mb-3">
+        @foreach (var section in Model.ImageSections)
         {
-            <img src="@Model.MainImageTopRight" class="thumb-img" />
-        }
-        @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
-        {
-            <img src="@Model.MainImageBottomRight" class="thumb-img" />
+            @if (!string.IsNullOrEmpty(section.ImageUrl))
+            {
+                <img src="@(section.ImageUrl)" class="thumb-img" />
+            }
         }
     </div>
 

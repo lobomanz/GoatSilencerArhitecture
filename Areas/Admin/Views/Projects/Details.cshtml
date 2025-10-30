@@ -27,51 +27,49 @@
 
         <dt class="col-sm-2">Updated</dt>
         <dd class="col-sm-10">@Model.UpdatedUtc.ToString("g")</dd>
+
+        <dt class="col-sm-2">Year Built</dt>
+        <dd class="col-sm-10">@Model.YearBuilt?.ToString("yyyy")</dd>
+
+        <dt class="col-sm-2">Location</dt>
+        <dd class="col-sm-10">@Model.Location</dd>
     </dl>
 </div>
 
-<h5>Main Images</h5>
+<h5>Main Image</h5>
 <div class="row mb-3">
-    @if (!string.IsNullOrEmpty(Model.MainImageLeft))
-    {
-        <div class="col-md-4">
-            <img src="@Model.MainImageLeft" class="img-fluid mb-2" />
-            @if (!string.IsNullOrEmpty(Model.ImageLeftHeading))
-            {
-                <h6>@Model.ImageLeftHeading</h6>
-            }
-            @if (!string.IsNullOrEmpty(Model.ImageLeftParagraph))
-            {
-                <p>@Model.ImageLeftParagraph</p>
-            }
-        </div>
-    }
-    <div class="col-md-8">
-        @if (!string.IsNullOrEmpty(Model.MainImageTopRight))
+    <div class="col-md-4">
+        @if (Model.MainImage != null && !string.IsNullOrEmpty(Model.MainImage.ImageUrl))
         {
-            <img src="@Model.MainImageTopRight" class="img-fluid mb-2" />
-            @if (!string.IsNullOrEmpty(Model.ImageRightTopHeading))
-            {
-                <h6>@Model.ImageRightTopHeading</h6>
-            }
-            @if (!string.IsNullOrEmpty(Model.ImageRightTopParagraph))
-            {
-                <p>@Model.ImageRightTopParagraph</p>
-            }
+            <img src="@Model.MainImage.ImageUrl" class="img-fluid mb-2" />
         }
-        @if (!string.IsNullOrEmpty(Model.MainImageBottomRight))
+        else
         {
-            <img src="@Model.MainImageBottomRight" class="img-fluid mb-2" />
-            @if (!string.IsNullOrEmpty(Model.ImageRightBottomHeading))
-            {
-                <h6>@Model.ImageRightBottomHeading</h6>
-            }
-            @if (!string.IsNullOrEmpty(Model.ImageRightBottomParagraph))
-            {
-                <p>@Model.ImageRightBottomParagraph</p>
-            }
+            <p>No main image set for this project.</p>
         }
     </div>
+</div>
+
+<h5>Image Sections</h5>
+<div class="row mb-3">
+    @foreach (var section in Model.ImageSections)
+    {
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(section.ImageUrl))
+            {
+                <img src="@(section.ImageUrl)" class="img-fluid mb-2" />
+            }
+            @if (!string.IsNullOrEmpty(section.Heading))
+            {
+                <h6>@(section.Heading)</h6>
+            }
+            @if (!string.IsNullOrEmpty(section.Paragraph))
+            {
+                <p>@(section.Paragraph)</p>
+            }
+            <p><em>Position: @(section.Position)</em></p>
+        </div>
+    }
 </div>
 
 

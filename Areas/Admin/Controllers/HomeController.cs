@@ -17,6 +17,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var projects = await _context.Projects
+                .Include(p => p.MainImage) // Add this
                 .OrderByDescending(p => p.UpdatedUtc)
                 .ToListAsync();
 
