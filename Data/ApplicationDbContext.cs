@@ -13,5 +13,7 @@ namespace GoatSilencerArchitecture.Data
         public DbSet<ImageModel> BlogImages { get; set; }
         public DbSet<BlogComponent> Blogs { get; set; }
         public DbSet<ContactInfo> ContactInfos { get; set; }
+        public DbSet<AboutUsSection> AboutUsSections { get; set; }
+
     }
 }

@@ -1,0 +1,202 @@
+@model List<GoatSilencerArchitecture.Models.AboutUsSection>
+
+@{
+    ViewData["Title"] = "Edit About Us Page";
+}
+
+<h1>Edit About Us Page</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-10">
+        <form asp-action="Save" method="post" id="edit-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Hidden field with selected blog IDs -->
+            <input type="hidden" id="BlogsIdList" name="BlogsIdList"
+                   value='@System.Text.Json.JsonSerializer.Serialize(Model.Select(m => m.BlogComponentId))' />
+
+            <!-- Button to open modal -->
+            <div class="form-group mb-3">
+                <button type="button" class="btn btn-secondary" id="openBlogPopup">Select Blogs</button>
+            </div>
+
+            <!-- Selected Blogs Table -->
+            <div id="selectedBlogsContainer" class="mt-3">
+                <h5>Selected Blogs</h5>
+                <table class="table table-bordered table-sm" id="selectedBlogsTable">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">Order</th>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Layout Type</th>
+                            <th>Created</th>
+                            <th>Updated</th>
+                            <th style="width:80px;">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr data-id="@item.BlogComponent.Id">
+                                <td class="handle" style="cursor:move;">#</td>
+                                <td>@item.BlogComponent.Id</td>
+                                <td>@item.BlogComponent.Title</td>
+                                <td>@item.BlogComponent.LayoutType</td>
+                                <td>@item.BlogComponent.CreatedUtc.ToString("yyyy-MM-dd")</td>
+                                <td>@item.BlogComponent.UpdatedUtc.ToString("yyyy-MM-dd")</td>
+                                <td><button type="button" class="btn btn-sm btn-danger remove-blog">X</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group mt-4">
+                <input type="submit" value="Save Changes" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Blog selection modal -->
+<div class="modal fade" id="blogPopup" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Blogs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm table-striped" id="blogsTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>LayoutType</th>
+                            <th>CreatedUtc</th>
+                            <th>UpdatedUtc</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addBlogsBtn">Add Selected</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <script>
+        // Preload server data into JS so blogs array has real info
+        let blogs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.Select(m => new {
+                id = m.BlogComponent.Id,
+                title = m.BlogComponent.Title,
+                layoutType = m.BlogComponent.LayoutType,
+                createdUtc = m.BlogComponent.CreatedUtc.ToString("yyyy-MM-dd"),
+                updatedUtc = m.BlogComponent.UpdatedUtc.ToString("yyyy-MM-dd")
+            })
+        ));
+
+        // Initialize selectedBlogIds based on Model
+        let selectedBlogIds = JSON.parse(document.getElementById("BlogsIdList").value || "[]");
+
+        renderSelectedBlogs();
+
+        // Open modal and load all blogs from backend
+        document.getElementById("openBlogPopup").addEventListener("click", function () {
+            fetch('@Url.Action("GetAllBlogs", "AboutUsPage", new { area = "Admin" })')
+                .then(res => res.json())
+                .then(data => {
+                    blogs = data;
+                    const tbody = document.querySelector("#blogsTable tbody");
+                    tbody.innerHTML = "";
+                    data.forEach(blog => {
+                        const checked = selectedBlogIds.includes(blog.id) ? "checked" : "";
+                        tbody.innerHTML += `
+                            <tr data-id="${blog.id}">
+                                <td><input type="checkbox" value="${blog.id}" ${checked}></td>
+                                <td>${blog.id}</td>
+                                <td>${blog.title}</td>
+                                <td>${blog.layoutType}</td>
+                                <td>${blog.createdUtc}</td>
+                                <td>${blog.updatedUtc}</td>
+                            </tr>`;
+                    });
+                    document.querySelectorAll("#blogsTable tbody tr").forEach(row => {
+                        row.addEventListener("click", function (e) {
+                            if (e.target.tagName !== "INPUT") {
+                                const cb = this.querySelector("input[type='checkbox']");
+                                cb.checked = !cb.checked;
+                            }
+                        });
+                    });
+                    new bootstrap.Modal(document.getElementById("blogPopup")).show();
+                });
+        });
+
+        // Add selected blogs from modal to main table
+        document.getElementById("addBlogsBtn").addEventListener("click", function () {
+            selectedBlogIds = Array.from(document.querySelectorAll("#blogsTable tbody input:checked"))
+                .map(cb => parseInt(cb.value));
+            renderSelectedBlogs();
+            bootstrap.Modal.getInstance(document.getElementById("blogPopup")).hide();
+        });
+
+        // Render main table (sortable + removable)
+        function renderSelectedBlogs() {
+            const tbody = document.querySelector("#selectedBlogsTable tbody");
+            tbody.innerHTML = "";
+
+            selectedBlogIds.forEach(id => {
+                const blog = blogs.find(b => b.id === id);
+                if (!blog) return; // skip missing ones (prevents fallback)
+
+                tbody.innerHTML += `
+                    <tr data-id="${id}">
+                        <td class="handle" style="cursor:move;">#</td>
+                        <td>${blog.id}</td>
+                        <td>${blog.title}</td>
+                        <td>${blog.layoutType}</td>
+                        <td>${blog.createdUtc}</td>
+                        <td>${blog.updatedUtc}</td>
+                        <td><button type="button" class="btn btn-sm btn-danger remove-blog">X</button></td>
+                    </tr>`;
+            });
+
+            // Make sortable
+            new Sortable(tbody, {
+                animation: 150,
+                handle: ".handle",
+                onEnd: function () {
+                    selectedBlogIds = Array.from(tbody.children).map(tr => parseInt(tr.dataset.id));
+                    updateHiddenField();
+                }
+            });
+
+            // Remove functionality
+            tbody.querySelectorAll(".remove-blog").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = parseInt(this.closest("tr").dataset.id);
+                    selectedBlogIds = selectedBlogIds.filter(x => x !== id);
+                    renderSelectedBlogs();
+                });
+            });
+
+            updateHiddenField();
+        }
+
+        // Update hidden field
+        function updateHiddenField() {
+            document.getElementById("BlogsIdList").value = JSON.stringify(selectedBlogIds);
+        }
+    </script>
+}
