@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GoatSilencerArchitecture.Data;
@@ -31,28 +30,32 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
         // POST: Admin/ContactInfo/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Email,PhoneNumber,CompanyName,Address")] ContactInfo contactInfo)
+        public async Task<IActionResult> Edit([Bind("Id,Email,PhoneNumber,CompanyName,Address")] ContactInfo contactInfo)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (id != contactInfo.Id)
-                {
-                    return NotFound();
-                }
-
-                if (id == 0)
-                {
-                    _context.Add(contactInfo);
-                }
-                else
-                {
-                    _context.Update(contactInfo);
-                }
-
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Edit));
+                // Return with validation errors
+                return View(contactInfo);
             }
-            return View(contactInfo);
+
+            // Check if a record exists
+            var existing = await _context.ContactInfos.FirstOrDefaultAsync();
+
+            if (existing == null)
+            {
+                _context.Add(contactInfo);
+            }
+            else
+            {
+                existing.CompanyName = contactInfo.CompanyName;
+                existing.Email = contactInfo.Email;
+                existing.PhoneNumber = contactInfo.PhoneNumber;
+                existing.Address = contactInfo.Address;
+                _context.Update(existing);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Edit));
         }
     }
 }
