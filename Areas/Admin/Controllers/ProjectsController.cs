@@ -12,11 +12,13 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IImageService _imageService;
+        private readonly ISettingsService _settingsService;
 
-        public ProjectsController(ApplicationDbContext context, IImageService imageService)
+        public ProjectsController(ApplicationDbContext context, IImageService imageService, ISettingsService settingsService)
         {
             _context = context;
             _imageService = imageService;
+            _settingsService = settingsService;
         }
 
         public class ProjectUpdateModel
@@ -24,12 +26,20 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             public int Id { get; set; }
             public bool IsPublished { get; set; }
             public int SortOrder { get; set; }
+            public string ProjectsMainPageLayoutType { get; set; }
+        }
+
+        public class ProjectsUpdateRequest
+        {
+            public List<ProjectUpdateModel> Projects { get; set; }
+            public string ProjectsMainPageLayoutType { get; set; }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProjects([FromBody] List<ProjectUpdateModel> projects)
+        public async Task<IActionResult> UpdateProjects([FromBody] ProjectsUpdateRequest request)
         {
+            var projects = request.Projects;
             if (projects == null || !projects.Any())
             {
                 return BadRequest("No projects to update.");
@@ -49,6 +59,12 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                 }
             }
 
+            // Save the layout type
+            if (!string.IsNullOrEmpty(request.ProjectsMainPageLayoutType))
+            {
+                _settingsService.SetProjectsMainPageLayoutType(request.ProjectsMainPageLayoutType);
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok();
@@ -62,6 +78,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             ViewData["CreatedUtcSortParm"] = sortOrder == "CreatedUtc" ? "createdUtc_desc" : "CreatedUtc";
             ViewData["UpdatedUtcSortParm"] = sortOrder == "UpdatedUtc" ? "updatedUtc_desc" : "UpdatedUtc";
             ViewData["EditMode"] = editMode;
+            ViewData["ProjectsMainPageLayoutType"] = _settingsService.GetProjectsMainPageLayoutType();
 
             if (searchString != null)
             {

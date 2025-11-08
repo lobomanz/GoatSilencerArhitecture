@@ -55,6 +55,14 @@
 <div class="mb-3">
     <button id="edit-mode-btn" class="btn btn-primary">Edit Mode</button>
     <button id="save-changes-btn" class="btn btn-secondary" style="display: none;">Save Changes</button>
+    <div id="layout-options" style="display: none; margin-left: 10px;">
+        <select id="layout-select" class="form-select">
+            <option selected>Select Layout</option>
+            <option value="1">Layout 1</option>
+            <option value="2">Layout 2</option>
+            <option value="3">Layout 3</option>
+        </select>
+    </div>
 </div>
 
 <p>
@@ -198,6 +206,7 @@
             const saveChangesBtn = $('#save-changes-btn');
             const projectsTbody = $('#projects-tbody');
             const isPublishedCheckboxes = $('.is-published-checkbox');
+            const layoutOptions = $('#layout-options');
 
             function applyEditMode() {
                 if (editMode) {
@@ -208,6 +217,7 @@
                         .addClass('btn-secondary');
 
                     saveChangesBtn.show();
+                    layoutOptions.show();
                     $('table').addClass('edit-mode-table');
                     isPublishedCheckboxes.prop('disabled', false);
 
@@ -238,6 +248,7 @@
                         .addClass('btn-primary');
 
                     saveChangesBtn.hide();
+                    layoutOptions.hide();
                     $('table').removeClass('edit-mode-table');
                     isPublishedCheckboxes.prop('disabled', true);
 
@@ -261,11 +272,18 @@
                     projects.push({ id: id, isPublished: isPublished, sortOrder: index + 1 });
                 });
 
+                const layoutType = $('#layout-select').val();
+
+                const request = {
+                    projects: projects,
+                    projectsMainPageLayoutType: layoutType
+                };
+
                 $.ajax({
                     url: '@Url.Action("UpdateProjects", "Projects")',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify(projects),
+                    data: JSON.stringify(request),
                     headers: {
                         RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                     },
@@ -280,6 +298,12 @@
 
             // Initialize (edit mode OFF)
             applyEditMode();
+
+            // Pre-select layout
+            const layoutType = '@ViewData["ProjectsMainPageLayoutType"]';
+            if (layoutType) {
+                $('#layout-select').val(layoutType);
+            }
         });
     </script>
 }

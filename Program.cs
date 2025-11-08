@@ -19,6 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IImageService, ImageService>();
+builder.Services.AddTransient<ISettingsService, SettingsService>();
 
 // Register RichText validator
 builder.Services.AddScoped<IRichTextValidator, RichTextValidator>();
