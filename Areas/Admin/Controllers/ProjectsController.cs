@@ -19,13 +19,49 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
             _imageService = imageService;
         }
 
+        public class ProjectUpdateModel
+        {
+            public int Id { get; set; }
+            public bool IsPublished { get; set; }
+            public int SortOrder { get; set; }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProjects([FromBody] List<ProjectUpdateModel> projects)
+        {
+            if (projects == null || !projects.Any())
+            {
+                return BadRequest("No projects to update.");
+            }
+
+            var projectIds = projects.Select(p => p.Id).ToList();
+            var projectsToUpdate = await _context.Projects.Where(p => projectIds.Contains(p.Id)).ToListAsync();
+
+            foreach (var projectModel in projects)
+            {
+                var projectToUpdate = projectsToUpdate.FirstOrDefault(p => p.Id == projectModel.Id);
+                if (projectToUpdate != null)
+                {
+                    projectToUpdate.IsPublished = projectModel.IsPublished;
+                    projectToUpdate.SortOrder = projectModel.SortOrder;
+                    projectToUpdate.UpdatedUtc = DateTime.UtcNow;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
         // GET: Admin/Projects
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber, bool editMode = false)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["SortOrderSortParm"] = sortOrder == "SortOrder" ? "sortOrder_desc" : "SortOrder";
             ViewData["CreatedUtcSortParm"] = sortOrder == "CreatedUtc" ? "createdUtc_desc" : "CreatedUtc";
             ViewData["UpdatedUtcSortParm"] = sortOrder == "UpdatedUtc" ? "updatedUtc_desc" : "UpdatedUtc";
+            ViewData["EditMode"] = editMode;
 
             if (searchString != null)
             {
@@ -78,7 +114,7 @@ namespace GoatSilencerArchitecture.Areas.Admin.Controllers
                     projects = projects.OrderBy(p => p.CreatedUtc);
                     break;
                 default:
-                    projects = projects.OrderByDescending(p => p.UpdatedUtc);
+                    projects = projects.OrderBy(p => p.SortOrder);
                     break;
             }
 

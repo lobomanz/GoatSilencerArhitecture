@@ -2,6 +2,20 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Admin/Projects/Shared.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+    <style>
+        .sortable-placeholder {
+            border: 2px dashed #ccc;
+            background-color: #f7f7f7;
+            height: 70px;
+        }
+
+        .edit-mode-table {
+            transform: scale(1.05);
+            transform-origin: center;
+            transition: transform 0.2s ease;
+        }
+    </style>
 }
 
 @{
@@ -11,14 +25,14 @@
     string GetSortIndicator(string sortParam)
     {
         if (string.IsNullOrEmpty(currentSort) && sortParam == "UpdatedUtc")
-            return " &#9660;"; // Default: UpdatedUtc desc
+            return " &#9660;"; // Default sort
 
         if (currentSort == sortParam)
-            return " &#9650;"; // Ascending
+            return " &#9650;"; // Asc
 
         var descParam = char.ToLower(sortParam[0]) + sortParam.Substring(1) + "_desc";
         if (currentSort == descParam)
-            return " &#9660;"; // Descending
+            return " &#9660;"; // Desc
 
         return "";
     }
@@ -38,11 +52,17 @@
 
 <h1>Projects</h1>
 
+<div class="mb-3">
+    <button id="edit-mode-btn" class="btn btn-primary">Edit Mode</button>
+    <button id="save-changes-btn" class="btn btn-secondary" style="display: none;">Save Changes</button>
+</div>
+
 <p>
     <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 
 <form asp-action="Index" method="get" id="search-form">
+    @Html.AntiForgeryToken()
     <div class="form-actions no-color">
         <p>
             Find by name:
@@ -56,29 +76,23 @@
 <table class="table table-striped align-middle">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstOrDefault().Id)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Id)</th>
             <th>Main Image</th>
             <th class="@GetSortClass("SortOrder")">
                 <a asp-action="Index"
-                   asp-route-sortOrder="@ViewData["SortOrderSortParm"]"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   asp-route-sortOrder="@(ViewData["SortOrderSortParm"])"
+                   asp-route-currentFilter="@(ViewData["CurrentFilter"])"
                    class="sort-link">
                     @Html.DisplayNameFor(model => model.FirstOrDefault().SortOrder)
                     @Html.Raw(GetSortIndicator("SortOrder"))
                 </a>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstOrDefault().Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstOrDefault().IsPublished)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Title)</th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().IsPublished)</th>
             <th class="@GetSortClass("CreatedUtc")">
                 <a asp-action="Index"
-                   asp-route-sortOrder="@ViewData["CreatedUtcSortParm"]"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   asp-route-sortOrder="@(ViewData["CreatedUtcSortParm"])"
+                   asp-route-currentFilter="@(ViewData["CurrentFilter"])"
                    class="sort-link">
                     @Html.DisplayNameFor(model => model.FirstOrDefault().CreatedUtc)
                     @Html.Raw(GetSortIndicator("CreatedUtc"))
@@ -86,40 +100,39 @@
             </th>
             <th class="@GetSortClass("UpdatedUtc")">
                 <a asp-action="Index"
-                   asp-route-sortOrder="@ViewData["UpdatedUtcSortParm"]"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   asp-route-sortOrder="@(ViewData["UpdatedUtcSortParm"])"
+                   asp-route-currentFilter="@(ViewData["CurrentFilter"])"
                    class="sort-link">
                     @Html.DisplayNameFor(model => model.FirstOrDefault().UpdatedUtc)
                     @Html.Raw(GetSortIndicator("UpdatedUtc"))
                 </a>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstOrDefault().YearBuilt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstOrDefault().Location)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().YearBuilt)</th>
+            <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Location)</th>
             <th></th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="projects-tbody">
         @foreach (var item in Model)
         {
-            <tr>
+            <tr data-id="@item.Id">
                 <td>@Html.DisplayFor(modelItem => item.Id)</td>
                 <td>
                     @if (item.MainImage != null && !string.IsNullOrEmpty(item.MainImage.ImageUrl))
                     {
-                        <img src="@item.MainImage.ImageUrl" alt="@item.MainImage.AltText" class="thumb-img" style="width:80px; height:60px; object-fit:cover;" />
+                        <img src="@item.MainImage.ImageUrl" alt="@item.MainImage.AltText"
+                             class="thumb-img" style="width:80px; height:60px; object-fit:cover;" />
                     }
                     else
                     {
                         <span class="text-muted">No image</span>
                     }
                 </td>
-                <td>@Html.DisplayFor(modelItem => item.SortOrder)</td>
+                <td class="sort-order-cell">@Html.DisplayFor(modelItem => item.SortOrder)</td>
                 <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@Html.DisplayFor(modelItem => item.IsPublished)</td>
+                <td>
+                    <input type="checkbox" class="is-published-checkbox" @(item.IsPublished ? "checked" : "") disabled />
+                </td>
                 <td>@Html.DisplayFor(modelItem => item.CreatedUtc)</td>
                 <td>@Html.DisplayFor(modelItem => item.UpdatedUtc)</td>
                 <td>@Html.DisplayFor(modelItem => item.YearBuilt)</td>
@@ -141,34 +154,132 @@
 
 <div class="d-flex justify-content-between mt-3">
     <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-sortOrder="@(ViewData["CurrentSort"])"
        asp-route-pageNumber="@(Model.PageIndex - 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       asp-route-currentFilter="@(ViewData["CurrentFilter"])"
        class="btn btn-default @prevDisabled">
         Previous
     </a>
     <a asp-action="Index"
-       asp-route-sortOrder="@ViewData["CurrentSort"]"
+       asp-route-sortOrder="@(ViewData["CurrentSort"])"
        asp-route-pageNumber="@(Model.PageIndex + 1)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+       asp-route-currentFilter="@(ViewData["CurrentFilter"])"
        class="btn btn-default @nextDisabled">
         Next
     </a>
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
     <script>
+        // --- Search debounce ---
         (function () {
             let timeout = null;
             const searchInput = document.getElementById('search-input');
             const searchForm = document.getElementById('search-form');
 
-            searchInput.addEventListener('input', function (e) {
-                clearTimeout(timeout);
-                timeout = setTimeout(function () {
-                    searchForm.submit();
-                }, 1000); // 1000ms delay
-            });
+            if (searchInput && searchForm) {
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function () {
+                        searchForm.submit();
+                    }, 1000);
+                });
+            }
         })();
+
+        // --- Edit Mode Toggle ---
+        $(function () {
+            let editMode = false;
+
+            const editModeBtn = $('#edit-mode-btn');
+            const saveChangesBtn = $('#save-changes-btn');
+            const projectsTbody = $('#projects-tbody');
+            const isPublishedCheckboxes = $('.is-published-checkbox');
+
+            function applyEditMode() {
+                if (editMode) {
+                    // Edit Mode ON
+                    editModeBtn
+                        .text('Cancel Edit')
+                        .removeClass('btn-primary')
+                        .addClass('btn-secondary');
+
+                    saveChangesBtn.show();
+                    $('table').addClass('edit-mode-table');
+                    isPublishedCheckboxes.prop('disabled', false);
+
+                    // Enable sortable rows
+                    projectsTbody.sortable({
+                        cursor: 'move',
+                        placeholder: 'sortable-placeholder',
+                        helper: function (e, tr) {
+                            const $originals = tr.children();
+                            const $helper = tr.clone();
+                            $helper.children().each(function (index) {
+                                $(this).width($originals.eq(index).width());
+                            });
+                            return $helper;
+                        },
+                        update: function () {
+                            projectsTbody.find('tr').each(function (index, row) {
+                                $(row).find('.sort-order-cell').text(index + 1);
+                            });
+                        }
+                    }).disableSelection();
+
+                } else {
+                    // Edit Mode OFF
+                    editModeBtn
+                        .text('Edit Mode')
+                        .removeClass('btn-secondary')
+                        .addClass('btn-primary');
+
+                    saveChangesBtn.hide();
+                    $('table').removeClass('edit-mode-table');
+                    isPublishedCheckboxes.prop('disabled', true);
+
+                    const hasSortable = projectsTbody.data('ui-sortable') || projectsTbody.data('sortable');
+                    if (hasSortable) {
+                        projectsTbody.sortable('destroy');
+                    }
+                }
+            }
+
+            editModeBtn.on('click', function () {
+                editMode = !editMode;
+                applyEditMode();
+            });
+
+            saveChangesBtn.on('click', function () {
+                const projects = [];
+                projectsTbody.find('tr').each(function (index, row) {
+                    const id = $(row).data('id');
+                    const isPublished = $(row).find('.is-published-checkbox').is(':checked');
+                    projects.push({ id: id, isPublished: isPublished, sortOrder: index + 1 });
+                });
+
+                $.ajax({
+                    url: '@Url.Action("UpdateProjects", "Projects")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(projects),
+                    headers: {
+                        RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        alert('An error occurred while saving the changes.');
+                    }
+                });
+            });
+
+            // Initialize (edit mode OFF)
+            applyEditMode();
+        });
     </script>
 }
