@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace GoatSilencerArchitecture.Views.Projects
+namespace GoatSilencerArchitecture.Areas.Public.Views.Projects
 {
-    public class DetailsModel : PageModel
+    public class IndexModel : PageModel
     {
         public void OnGet()
         {
