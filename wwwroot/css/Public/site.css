@@ -1,17 +1,228 @@
-/* Error: Can't find stylesheet to import.
- *   ,
- * 1 | @use 'layouts.scss';
- *   | ^^^^^^^^^^^^^^^^^^^
- *   '
- *   wwwroot\scss\Public\site.scss 1:1  root stylesheet */
-
-body::before {
-  font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
-      "Droid Sans Mono", monospace, monospace;
-  white-space: pre;
-  display: block;
-  padding: 1em;
-  margin-bottom: 1em;
-  border-bottom: 2px solid black;
-  content: "Error: Can't find stylesheet to import.\a   \2577 \a 1 \2502  @use 'layouts.scss';\d\a   \2502  ^^^^^^^^^^^^^^^^^^^\a   \2575 \a   wwwroot\\scss\\Public\\site.scss 1:1  root stylesheet";
+.container-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 40px;
+  padding: 20px;
+  border: none;
+  border-radius: 8px;
+  gap: 20px;
 }
+.container-layout .text-content {
+  flex: 1;
+  padding: 10px;
+}
+.container-layout .image-content,
+.container-layout .image-content-left,
+.container-layout .image-content-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container-layout .image-content img,
+.container-layout .image-content-left img,
+.container-layout .image-content-right img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Type 1: Picture Right (50%), Text Left (50%) */
+.layout-type-1 .text-content {
+  flex: 1 1 45%;
+}
+.layout-type-1 .image-content {
+  flex: 1 1 45%;
+}
+
+/* Type 2: Picture Left (50%), Text Right (50%) */
+.layout-type-2 .text-content {
+  flex: 1 1 45%;
+}
+.layout-type-2 .image-content {
+  flex: 1 1 45%;
+}
+
+/* Type 3: Picture Left (30%), Text Middle (40%), Picture Right (30%) */
+.layout-type-3 .image-content-left {
+  flex: 0 0 28%;
+}
+.layout-type-3 .text-content {
+  flex: 1 1 36%;
+}
+.layout-type-3 .image-content-right {
+  flex: 0 0 28%;
+}
+
+/* Type 4: Image Top Right, Text Left (Spill Below) */
+.layout-type-4 {
+  display: block;
+}
+.layout-type-4 .image-content {
+  float: right;
+  width: 30%;
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+.layout-type-4 .image-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.layout-type-4::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Type 5: Image Top Left, Text Right (Spill Below) */
+.layout-type-5 {
+  display: block;
+}
+.layout-type-5 .image-content {
+  float: left;
+  width: 30%;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+.layout-type-5 .image-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.layout-type-5::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Type 6: 100% Text */
+.layout-type-6 .text-content {
+  flex: 0 0 100%;
+}
+
+/* Type 7: 100% Picture */
+.layout-type-7 .image-content {
+  flex: 0 0 100%;
+}
+.layout-type-7 .image-content img {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container-layout {
+    flex-direction: column;
+  }
+  .container-layout .text-content,
+  .container-layout .image-content,
+  .container-layout .image-content-left,
+  .container-layout .image-content-right {
+    flex: 0 0 100%;
+    padding: 0;
+  }
+  .layout-type-2 {
+    flex-direction: column;
+  }
+  .layout-type-4 .image-content, .layout-type-5 .image-content, .layout-type-6 .image-content, .layout-type-7 .image-content {
+    float: none;
+    width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 15px;
+  }
+}
+/* Header Animation Styles */
+header {
+  position: fixed; /* Changed from relative to fixed */
+  top: -100px; /* Start above the viewport (adjust as needed) */
+  width: 100%; /* Ensure it spans the full width */
+  z-index: 1030; /* Ensure it stays on top of other content */
+  opacity: 0;
+  transition: top 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+header.show {
+  top: 0;
+  opacity: 1;
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+body {
+  font-family: "Inter", sans-serif;
+  color: #222;
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+header .nav-link {
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+.navbar-nav {
+  flex-wrap: nowrap;
+}
+.navbar-nav .nav-item .nav-link {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+body main {
+  padding-inline: 50px;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+}
+header .navbar {
+  padding-inline: 50px;
+  padding-block: 10px;
+}
+header .navbar .bg-white {
+  background: #fff;
+}
+header .navbar .container-fluid {
+  padding-inline: 0px;
+}
+header .navbar .pr-0 {
+  padding-right: 0px;
+}
+
+/*# sourceMappingURL=site.css.map */
