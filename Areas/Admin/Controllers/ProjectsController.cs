@@ -2,12 +2,14 @@ using GoatSilencerArchitecture.Data;
 using GoatSilencerArchitecture.Models;
 using GoatSilencerArchitecture.Services;
 using GoatSilencerArchitecture.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;

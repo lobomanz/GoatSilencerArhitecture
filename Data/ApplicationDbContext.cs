@@ -4,7 +4,8 @@ using GoatSilencerArchitecture.Models;
 
 namespace GoatSilencerArchitecture.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    // NOTE: changed from IdentityDbContext to IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
@@ -14,6 +15,5 @@ namespace GoatSilencerArchitecture.Data
         public DbSet<BlogComponent> Blogs { get; set; }
         public DbSet<ContactInfo> ContactInfos { get; set; }
         public DbSet<AboutUsSection> AboutUsSections { get; set; }
-
     }
 }

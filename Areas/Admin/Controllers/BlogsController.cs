@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Globalization;
 
 using GoatSilencerArchitecture.Utilities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class BlogsController : Controller
     {
         private readonly ApplicationDbContext _context;

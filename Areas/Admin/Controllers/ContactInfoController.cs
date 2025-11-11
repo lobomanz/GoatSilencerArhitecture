@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GoatSilencerArchitecture.Data;
 using GoatSilencerArchitecture.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class ContactInfoController : Controller
     {
         private readonly ApplicationDbContext _context;

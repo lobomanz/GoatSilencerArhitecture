@@ -2,10 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using GoatSilencerArchitecture.Data;
 using GoatSilencerArchitecture.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GoatSilencerArchitecture.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class AboutUsPageController : Controller
     {
         private readonly ApplicationDbContext _context;
