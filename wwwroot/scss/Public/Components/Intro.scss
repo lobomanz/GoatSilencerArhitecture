@@ -1,0 +1,133 @@
+
+
+/* Intro.scss */
+.intro-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 4rem 0;
+    text-align: center;
+    overflow-x: hidden; // Prevent scrollbars during animation
+    background: transparent;
+
+    .animated-heading {
+        font-size: 100px;
+        position: relative;
+        display: inline-block;
+
+        span {
+            font-family: system-ui;
+            color: antiquewhite;
+            opacity: 0;
+            position: relative;
+        }
+
+        &.animate {
+            .part1 {
+                animation: slideFromLeft 3.5s forwards;
+            }
+
+            .part2 {
+                animation: slideFromRight 3.5s forwards;
+            }
+        }
+    }
+}
+
+@keyframes slideFromLeft {
+    0% {
+        left: -200px;
+        opacity: 0;
+    }
+    
+    100% {
+        left: 0;
+        opacity: 1;
+    }
+}
+
+@keyframes slideFromRight {
+    0% {
+        right: -200px;
+        opacity: 0;
+    }
+    
+    100% {
+        right: 0;
+        opacity: 1;
+    }
+}
+
+
+
+
+
+.intro {
+    position:absolute;
+    top:0;
+    left:0;
+    z-index: 8888;
+    background: url("https://newevolutiondesigns.com/images/freebies/cool-wallpaper-3.jpg"), linear-gradient(233deg, #c6d8cf, #dfbbb6, #edc8b0, #e5ddd1);
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-blend-mode: hard-light;
+    -webkit-animation: hue-rotate 3s linear infinite;
+    animation: hue-rotate 3s linear infinite;
+}
+
+@-webkit-keyframes hue-rotate {
+    from {
+        -webkit-filter: hue-rotate(0);
+        -moz-filter: hue-rotate(0);
+        -ms-filter: hue-rotate(0);
+        filter: hue-rotate(0);
+    }
+
+    to {
+        -webkit-filter: hue-rotate(360deg);
+        -moz-filter: hue-rotate(360deg);
+        -ms-filter: hue-rotate(360deg);
+        filter: hue-rotate(360deg);
+    }
+}
+
+@keyframes hue-rotate {
+    from {
+        -webkit-filter: hue-rotate(0);
+        -moz-filter: hue-rotate(0);
+        -ms-filter: hue-rotate(0);
+        filter: hue-rotate(0);
+    }
+
+    to {
+        -webkit-filter: hue-rotate(360deg);
+        -moz-filter: hue-rotate(360deg);
+        -ms-filter: hue-rotate(360deg);
+        filter: hue-rotate(360deg);
+    }
+}
+.intro-container{
+    z-index:99999;
+    display:block;
+    opacity:1;
+    width:100vw;
+    height:100vh;
+    position:fixed;
+    top:0;
+    left:0;
+    transition:opacity 1.5s;
+}
+.no-opacity{
+    opacity:0;
+}
+.display-none{
+    display:none;
+}

@@ -41,12 +41,16 @@
     </div>
 </div>
 
+<partial name="~/Areas/Public/Components/_Intro.cshtml" />
+
 @section Styles {
     <link rel="stylesheet" href="~/css/Public/Home/Index.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Public/Components/Intro.css" asp-append-version="true" />
 }
 
 @section Scripts {
     <script src="~/js/Home/Index.js" asp-append-version="true"></script>
+    <script src="~/js/Public/Components/intro.js" asp-append-version="true"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const slides = document.querySelectorAll('.slide');
