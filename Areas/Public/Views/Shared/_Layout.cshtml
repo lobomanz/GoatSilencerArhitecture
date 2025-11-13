@@ -1,6 +1,7 @@
 @{
     var isAboutPage = ViewContext.RouteData.Values["controller"]?.ToString().Equals("About", StringComparison.OrdinalIgnoreCase) ?? false;
 }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - GoatSilencer Architecture</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Public/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="@(isAboutPage ? "bg-dark text-white" : "")" style="padding-top: 60px;">
