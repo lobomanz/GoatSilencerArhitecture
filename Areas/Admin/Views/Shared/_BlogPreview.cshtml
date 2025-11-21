@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="~/css/layouts.css" asp-append-version="true" />
 
 <section class="container-layout @Model.LayoutType">
-    @if (Model.LayoutType == "layout-type-1")
+    @if (Model.LayoutType == LayoutTypeEnum.LayoutType1)
     {
         <div class="text-content">
             @Html.Raw(Model.TextContent)
@@ -16,7 +16,7 @@
             }
         </div>
     }
-    else if (Model.LayoutType == "layout-type-2")
+    else if (Model.LayoutType == LayoutTypeEnum.LayoutType2)
     {
         <div class="image-content">
             @if (!string.IsNullOrEmpty(Model.Image1Path))
@@ -28,7 +28,7 @@
             @Html.Raw(Model.TextContent)
         </div>
     }
-    else if (Model.LayoutType == "layout-type-3")
+    else if (Model.LayoutType == LayoutTypeEnum.LayoutType3)
     {
         <div class="image-content-left">
             @if (!string.IsNullOrEmpty(Model.Image1Path))
@@ -46,7 +46,7 @@
             }
         </div>
     }
-    else if (Model.LayoutType == "layout-type-4")
+    else if (Model.LayoutType == LayoutTypeEnum.LayoutType4)
     {
         <div class="image-content image-float-right">
             @if (!string.IsNullOrEmpty(Model.Image1Path))
@@ -58,7 +58,7 @@
             @Html.Raw(Model.TextContent)
         </div>
     }
-    else if (Model.LayoutType == "layout-type-5")
+    else if (Model.LayoutType == LayoutTypeEnum.LayoutType5)
     {
         <div class="image-content image-float-left">
             @if (!string.IsNullOrEmpty(Model.Image1Path))
@@ -70,13 +70,13 @@
             @Html.Raw(Model.TextContent)
         </div>
     }
-    else if (Model.LayoutType == "layout-type-6")
+    else if (Model.LayoutType == LayoutTypeEnum.LayoutType6)
     {
         <div class="text-content full-width">
             @Html.Raw(Model.TextContent)
         </div>
     }
-    else if (Model.LayoutType == "layout-type-7")
+    else if (Model.LayoutType == LayoutTypeEnum.LayoutType7)
     {
         <div class="image-content full-width">
             @if (!string.IsNullOrEmpty(Model.Image1Path))
@@ -85,7 +85,7 @@
             }
         </div>
     }
-    else if (Model.LayoutType == "layout-type-8")
+    else if (Model.LayoutType == LayoutTypeEnum.LayoutType8)
     {
         if (Model.Images != null && Model.Images.Any())
         {

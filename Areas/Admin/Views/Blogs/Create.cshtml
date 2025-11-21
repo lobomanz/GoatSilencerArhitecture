@@ -23,19 +23,13 @@
             <!-- Layout Type -->
             <div class="form-group">
                 <label asp-for="LayoutType" class="control-label"></label>
-                <select asp-for="LayoutType" class="form-control" id="LayoutType">
-                    <option value="layout-type-1">Layout Type 1 (Text Left, Image Right)</option>
-                    <option value="layout-type-2">Layout Type 2 (Image Left, Text Right)</option>
-                    <option value="layout-type-3">Layout Type 3 (Image Left, Text Middle, Image Right)</option>
-                    <option value="layout-type-4">Layout Type 4 (Image Top Right, Text Spill Left)</option>
-                    <option value="layout-type-5">Layout Type 5 (Image Top Left, Text Spill Right)</option>
-                    <option value="layout-type-6">Layout Type 6 (100% Text)</option>
-                    <option value="layout-type-7">Layout Type 7 (100% Picture)</option>
-                    <option value="layout-type-8">Layout Type 8 (Gallery)</option>
+                <select asp-for="LayoutType"
+                        asp-items="Html.GetEnumSelectList<LayoutTypeEnum>()"
+                        class="form-control">
                 </select>
-                <input type="hidden" asp-for="LayoutType" />
                 <span asp-validation-for="LayoutType" class="text-danger"></span>
             </div>
+
 
             <!-- Text -->
             <div class="form-group" id="textContentGroup">

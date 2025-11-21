@@ -14,7 +14,7 @@
     @foreach (var component in components)
     {
         <section class="container-layout @component.LayoutType">
-            @if (component.LayoutType == "layout-type-1")
+            @if (component.LayoutType == LayoutTypeEnum.LayoutType1)
             {
                 <div class="text-content">
                     @Html.Raw(component.TextContent)
@@ -29,7 +29,7 @@
                     }
                 </div>
             }
-            else if (component.LayoutType == "layout-type-2")
+            else if (component.LayoutType == LayoutTypeEnum.LayoutType2)
             {
                 <div class="image-content">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
@@ -44,7 +44,7 @@
                     @Html.Raw(component.TextContent)
                 </div>
             }
-            else if (component.LayoutType == "layout-type-3")
+            else if (component.LayoutType == LayoutTypeEnum.LayoutType3)
             {
                 <div class="image-content-left">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
@@ -68,7 +68,7 @@
                     }
                 </div>
             }
-            else if (component.LayoutType == "layout-type-4")
+            else if (component.LayoutType == LayoutTypeEnum.LayoutType4)
             {
                 <div class="image-content image-float-right">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
@@ -83,7 +83,7 @@
                     @Html.Raw(component.TextContent)
                 </div>
             }
-            else if (component.LayoutType == "layout-type-5")
+            else if (component.LayoutType == LayoutTypeEnum.LayoutType5)
             {
                 <div class="image-content image-float-left">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
@@ -98,13 +98,13 @@
                     @Html.Raw(component.TextContent)
                 </div>
             }
-            else if (component.LayoutType == "layout-type-6")
+            else if (component.LayoutType == LayoutTypeEnum.LayoutType6)
             {
                 <div class="text-content full-width">
                     @Html.Raw(component.TextContent)
                 </div>
             }
-            else if (component.LayoutType == "layout-type-7")
+            else if (component.LayoutType == LayoutTypeEnum.LayoutType7)
             {
                 <div class="image-content full-width">
                     @if (!string.IsNullOrEmpty(component.Image1Path))
@@ -116,7 +116,7 @@
                     }
                 </div>
             }
-            else if (component.LayoutType == "layout-type-8")
+            else if (component.LayoutType == LayoutTypeEnum.LayoutType8)
             {
                 if (component.Images != null && component.Images.Any())
                 {

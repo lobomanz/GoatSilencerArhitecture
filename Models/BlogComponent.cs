@@ -10,7 +10,7 @@ namespace GoatSilencerArchitecture.Models
         public string Title { get; set; } = string.Empty;
 
         [Required]
-        public string LayoutType { get; set; } = ""; // e.g., "layout-type-1", "layout-type-10"
+        public LayoutTypeEnum LayoutType { get; set; }  // e.g., "layout-type-1", "layout-type-10"
 
         [Column(TypeName = "TEXT")] // For rich text content
         public string? TextContent { get; set; } = "";
