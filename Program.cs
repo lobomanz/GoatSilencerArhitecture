@@ -137,6 +137,12 @@ app.MapControllerRoute(
 // Enables /Identity/... pages (Login, Register, etc.)
 app.MapRazorPages();
 
+app.MapGet("/Identity/Account/Register", context =>
+{
+    context.Response.Redirect("/Identity/Account/Login");
+    return Task.CompletedTask;
+});
+
 // ------------------------------------------------------
 // Role + Admin seeding
 // ------------------------------------------------------
