@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "User Created";
+}
+
+<h2>User Created Successfully!</h2>
+
+<p>Email: @ViewBag.CreatedUserEmail</p>
+
+@if (ViewBag.PasswordLink != null)
+{
+    <p>
+        <a href="@ViewBag.PasswordLink">Set Password for this User</a>
+    </p>
+}
+
+<a href="@Url.Action("Create")">Create Another User</a>
